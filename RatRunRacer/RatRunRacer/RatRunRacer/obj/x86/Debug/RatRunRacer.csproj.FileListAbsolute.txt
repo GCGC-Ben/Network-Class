@@ -1,0 +1,7 @@
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\bin\x86\Debug\Content\Fonts\Font1.xnb
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\bin\x86\Debug\RatRunRacer.exe
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\bin\x86\Debug\RatRunRacer.pdb
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\obj\x86\Debug\RatRunRacer.csprojResolveAssemblyReference.cache
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\obj\x86\Debug\RatRunRacer.exe
+C:\RatRunRacer\RatRunRacer\RatRunRacer\RatRunRacer\obj\x86\Debug\RatRunRacer.pdb
