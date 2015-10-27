@@ -18,6 +18,7 @@ namespace RatRunRacer
         GraphicsDevice device;
         SpriteBatch spriteBatch;
         SpriteFont font;
+        Rat myPlayer;
 
         public Game1()
         {
@@ -30,7 +31,11 @@ namespace RatRunRacer
             device = graphics.GraphicsDevice;
 
             this.Window.Title = "Rat Run Racer";
+            graphics.PreferredBackBufferWidth = 1280;//720p
+            graphics.PreferredBackBufferHeight = 720;
             graphics.ApplyChanges();
+
+            myPlayer = new Rat(Color.Red, new Vector2(0, 500));
 
             base.Initialize();
         }
@@ -39,6 +44,7 @@ namespace RatRunRacer
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("Fonts\\Font1");
+            Rat.load(Content);
         }
 
         protected override void UnloadContent()
@@ -51,6 +57,9 @@ namespace RatRunRacer
            
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+
+            myPlayer.update();
+            
 
             base.Update(gameTime);
         }
@@ -68,6 +77,8 @@ namespace RatRunRacer
             spriteBatch.End();//end HUD draw
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend); //Start Game Draw    TODO: add camera logic
+
+            myPlayer.draw(spriteBatch);
 
             spriteBatch.End();//end game draw
 
