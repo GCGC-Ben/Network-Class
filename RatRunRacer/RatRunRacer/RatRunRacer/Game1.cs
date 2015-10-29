@@ -19,6 +19,7 @@ namespace RatRunRacer
         SpriteBatch spriteBatch;
         SpriteFont font;
         Rat myPlayer;
+        Camera2d cam;
 
         public Game1()
         {
@@ -37,6 +38,8 @@ namespace RatRunRacer
 
             myPlayer = new Rat(Color.Red, new Vector2(0, 500));
 
+            cam = new Camera2d();
+            cam._pos.Y = 0;
             base.Initialize();
         }
 
@@ -59,7 +62,7 @@ namespace RatRunRacer
                 this.Exit();
 
             myPlayer.update();
-            
+            cam._pos.X = myPlayer.pos.X;
 
             base.Update(gameTime);
         }
@@ -72,11 +75,12 @@ namespace RatRunRacer
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend); //Start Hud draw
 
-            spriteBatch.DrawString(font, "Jackson likes men", new Vector2(100, 100), new Color(255, 255, 255));
+            spriteBatch.DrawString(font, "Jackson likes men a lot and he denies it", new Vector2(100, 100), new Color(255, 255, 255));
 
             spriteBatch.End();//end HUD draw
 
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend); //Start Game Draw    TODO: add camera logic
+
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend,null,null,null,null,cam.get_transformation(device)); //Start Game Draw    TODO: add camera logic
 
             myPlayer.draw(spriteBatch);
 
