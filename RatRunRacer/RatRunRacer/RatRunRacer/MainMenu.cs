@@ -49,6 +49,7 @@ namespace RatRunRacer{
             connectTxt = content.Load<Texture2D>("Player\\rat");
         }
 
+
         //Add all the buttons to main's arraylist of buttons
         public void generateMenu()
         {
@@ -56,6 +57,7 @@ namespace RatRunRacer{
             main.addButton(optionsTxt, optionsPos, Color.Green);
             main.addButton(connectTxt, connectPos, Color.Purple);
         }
+
 
         //not sure what needs to bu updated with menu unless we want fancy stuff
         //also contains logic for commands
@@ -69,6 +71,7 @@ namespace RatRunRacer{
             }
             */
         }
+
 
         public void Draw(SpriteBatch sb)
         {

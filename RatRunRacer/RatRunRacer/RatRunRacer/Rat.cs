@@ -11,7 +11,7 @@ namespace RatRunRacer
 {
     class Rat
     {
-        Vector2 pos;
+        public Vector2 pos;
         static Texture2D txt;
         Color c;
         Vector2 acc;
@@ -42,19 +42,19 @@ namespace RatRunRacer
                 acc.X -= .2f;
             }
 
-            if (kb.IsKeyDown(Keys.Space) && onGround)
+            if ((kb.IsKeyDown(Keys.Space)||kb.IsKeyDown(Keys.Up)) && onGround)
             {
                 acc.Y = -5f;
             }
 
-            if (pos.Y < 500)
+            if (pos.Y < 0)
             {
                 acc.Y += .3f;
                 onGround = false;
             }
             else
             {
-                pos.Y = 500;
+                pos.Y = 0;
                 onGround = true;
                 vel.Y = 0;
             }
