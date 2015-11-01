@@ -20,6 +20,7 @@ namespace RatRunRacer
         SpriteFont font;
         Rat myPlayer;
         Camera2d cam;
+        World World1;
 
         public Game1()
         {
@@ -36,10 +37,11 @@ namespace RatRunRacer
             graphics.PreferredBackBufferHeight = 720;
             graphics.ApplyChanges();
 
-            myPlayer = new Rat(Color.Red, new Vector2(0, 500));
+            myPlayer = new Rat(Color.White, new Vector2(0, -10));
 
             cam = new Camera2d();
-            cam._pos.Y = 0;
+            cam._pos.Y = -200;
+            
             base.Initialize();
         }
 
@@ -48,21 +50,26 @@ namespace RatRunRacer
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("Fonts\\Font1");
             Rat.load(Content);
+
+            World.load(Content);
+            World1 = new World();
         }
 
         protected override void UnloadContent()
         {
+
         }
 
- 
         protected override void Update(GameTime gameTime)
         {
            
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            myPlayer.update();
+            myPlayer.update(World1);
             cam._pos.X = myPlayer.pos.X;
+            World1.update();
+
 
             base.Update(gameTime);
         }
@@ -70,12 +77,12 @@ namespace RatRunRacer
      
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.SkyBlue);
 
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend); //Start Hud draw
 
-            spriteBatch.DrawString(font, "Jackson likes men a lot and he denies it", new Vector2(100, 100), new Color(255, 255, 255));
+            //spriteBatch.DrawString(font, "Jackson likes men a lot and he denies it", new Vector2(100, 100), new Color(255, 255, 255));
 
             spriteBatch.End();//end HUD draw
 
@@ -83,8 +90,10 @@ namespace RatRunRacer
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend,null,null,null,null,cam.get_transformation(device)); //Start Game Draw    TODO: add camera logic
 
             myPlayer.draw(spriteBatch);
+            World1.draw(spriteBatch, cam.Pos);
 
             spriteBatch.End();//end game draw
+
 
             base.Draw(gameTime);
         }
