@@ -12,7 +12,7 @@ namespace RatRunRacer
 {
     class World
     {
-        public static Texture2D dirtTxt,dirtBottemTxt,cloudTxt,cloud2Txt;
+        public static Texture2D dirtTxt,dirtBottemTxt,cloudTxt,cloud2Txt,rockTxt;
         Random rand;
 
         List<Tile> allWorldTiles = new List<Tile>();
@@ -24,6 +24,7 @@ namespace RatRunRacer
             dirtBottemTxt = content.Load<Texture2D>("Tiles\\DirtBottem");
             cloudTxt = content.Load<Texture2D>("Tiles\\Cloud");
             cloud2Txt = content.Load<Texture2D>("Tiles\\Cloud2");
+            rockTxt = content.Load<Texture2D>("Tiles\\Rock");
         }
 
         public World()
@@ -43,7 +44,7 @@ namespace RatRunRacer
                 }
             }
 
-            for(int i = 0; i < size/2; i++)
+            for(int i = 0; i < size/2; i++) //Make clouds
             {
                 if (rand.Next(100) < 20)
                 {
@@ -56,6 +57,22 @@ namespace RatRunRacer
                     {
                         Tile t = new Tile(new Vector2(32 * i, -rand.Next(500) - 100), cloud2Txt);
                         allWorldTiles.Add(t);
+                    }
+                }
+            }
+
+            for (int i = 0; i < size; i++) //generate the platforms
+            {
+                if (rand.Next(100) < 10)
+                {
+                    int height = -rand.Next(200) - 20;
+                    for (int i2 = 0; i2 < 4; i2++)
+                    {
+                        Tile t = new Tile(new Vector2(16 * i, height), rockTxt);
+
+                        solidTiles.Add(t);
+                        allWorldTiles.Add(t);
+                        i++;
                     }
                 }
             }
