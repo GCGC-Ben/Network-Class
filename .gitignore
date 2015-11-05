@@ -4,3 +4,12 @@ RatRunRacer/RatRunRacer/RatRunRacer/obj/x86/Debug/RatRunRacer.exe
 RatRunRacer/RatRunRacer.suo
 RatRunRacer/RatRunRacer/RatRunRacer/obj/
 RatRunRacer/RatRunRacer/RatRunRacer/RatRunRacer.csproj.Debug.cachefile
+Server/Server/Server/obj/
+Server/Server/Server/bin/Debug/
+Server/Client/Client/obj/
+Server/Client/Client/bin/Debug/Client.pdb
+Server/Client/Client/bin/Debug/Client.vshost.exe.config
+Server/Client/Client/bin/Debug/Client.vshost.exe
+Server/Client/Client/bin/Debug/Client.vshost.exe.manifest
+Server/Client/Client/bin/Debug/Client.exe.config
+Server/Client/Client/bin/Debug/Client.exe

@@ -45,6 +45,11 @@ namespace RatRunRacer
                     onGround = true;
                     vel.Y = 0;
                 }
+
+                if (t.getBB().Intersects(bb))
+                {
+                    vel.Y = 0;
+                }
             }
 
 
