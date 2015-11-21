@@ -20,11 +20,13 @@ namespace RatRunRacer
         Rectangle bb;
         bool facingRight;
         bool justHitGround;
+        Vector2 startPos;
 
         public Rat(Color c, Vector2 startPos)
         {
             this.c = c;
             pos = startPos;
+            this.startPos = startPos;
         }
 
         public static void load(ContentManager content)
@@ -79,6 +81,11 @@ namespace RatRunRacer
             }
 
             ResolveForces(world1);
+
+            if (pos.Y > 1600)
+            {
+                pos = startPos;
+            }
 
         }
 

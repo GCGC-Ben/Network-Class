@@ -14,7 +14,7 @@ namespace Client
     {
         static Socket s;
         static bool connected;
-
+       
         static void Main(string[] args)
         {
             Thread t = new Thread(readThread);

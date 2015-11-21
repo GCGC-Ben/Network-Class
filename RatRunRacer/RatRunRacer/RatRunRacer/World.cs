@@ -12,7 +12,7 @@ namespace RatRunRacer
 {
     class World
     {
-        public static Texture2D dirtTxt,dirtBottemTxt,cloudTxt,cloud2Txt,rockTxt;
+        public static Texture2D dirtTxt,dirtBottemTxt,cloudTxt,cloud2Txt,rockTxt,platTxt,flTxt,blacknessTxt;
         public static Texture2D level1Map;
         Random rand;
 
@@ -26,6 +26,10 @@ namespace RatRunRacer
             cloudTxt = content.Load<Texture2D>("Tiles\\Cloud");
             cloud2Txt = content.Load<Texture2D>("Tiles\\Cloud2");
             rockTxt = content.Load<Texture2D>("Tiles\\Rock");
+            platTxt = content.Load<Texture2D>("Tiles\\plat");
+            flTxt = content.Load<Texture2D>("Tiles\\finshline");
+            blacknessTxt = content.Load<Texture2D>("Tiles\\blackness");
+
             level1Map = content.Load<Texture2D>("Level\\Level1");
         }
 
@@ -53,14 +57,27 @@ namespace RatRunRacer
                          allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),dirtBottemTxt));
                         }
                         break;
+
+                    case 200:
+                         allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),flTxt));
+                        break;
+
                     case 0:
                         if (levelColors[x + (y * level1Map.Width)].A == 255)
                         {
-                            allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),dirtTxt));
-                            solidTiles.Add(new Tile(new Vector2(x * 16, y * 16), dirtTxt));
+                            allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),platTxt));
+                            solidTiles.Add(new Tile(new Vector2(x * 16, y * 16), platTxt ));
                         }
                         break;
                 }
+                }
+            }
+
+            for (int x = 0; x < level1Map.Width; x++)
+            {
+                for(int y= 100; y <200; y++)
+                {
+                    allWorldTiles.Add(new Tile(new Vector2(x * 16, y * 16), blacknessTxt));
                 }
             }
 
