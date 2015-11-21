@@ -21,17 +21,20 @@ namespace RatRunRacer
         bool facingRight;
         bool justHitGround;
         Vector2 startPos;
+        public string username {get;set;} 
 
         public Rat(Color c, Vector2 startPos)
         {
             this.c = c;
             pos = startPos;
             this.startPos = startPos;
+            username = "";
         }
 
         public static void load(ContentManager content)
         {
             txt = content.Load<Texture2D>("Player\\rat");
+            
         }
 
         public void update(World world1)
@@ -41,7 +44,7 @@ namespace RatRunRacer
             bb = new Rectangle((int)pos.X-32,(int)pos.Y-16,64,17);
             onGround = false;
             justHitGround = false;
-            foreach (Tile t in world1.solidTiles) //super intensive consider a map
+            foreach (Tile t in world1.solidTiles) //super intensive consider a map probally fine though
             {
                 if (pos.Y <= t.getBB().Bottom && t.getBB().Intersects(bb)&& vel.Y > 0)
                 {
@@ -82,7 +85,7 @@ namespace RatRunRacer
 
             ResolveForces(world1);
 
-            if (pos.Y > 1600)
+            if (pos.Y > 1600) //you fell off the map reset at start 
             {
                 pos = startPos;
             }
@@ -128,7 +131,7 @@ namespace RatRunRacer
 
             if (!justHitGround) //skip this for when you hit the ground
             {
-                foreach (Tile t in world1.solidTiles) //super intensive consider a map
+                foreach (Tile t in world1.solidTiles) //same as intensive above but it seems to be fine
                 {
                     if (nbb.Intersects(t.getBB()))
                     {
@@ -153,7 +156,7 @@ namespace RatRunRacer
             {
                 sb.Draw(txt, pos, null, c, 0f, new Vector2(txt.Width / 2, txt.Height), 1f, SpriteEffects.FlipHorizontally, .5f);
             }
-            //sb.Draw(txt, bb, Color.Red); bounding box
+            //sb.Draw(txt, bb, Color.Red); // debuging bounding box
         }
 
     }

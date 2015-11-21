@@ -40,11 +40,12 @@ namespace RatRunRacer
             graphics.PreferredBackBufferHeight = 720;
             graphics.ApplyChanges();
 
-            mainMenu = new MainMenu(new Vector2(640, 260), new Vector2(640, 360), new Vector2(640, 460));
+            mainMenu = new MainMenu(new Vector2(640, 280), new Vector2(640, 380));
             myPlayer = new Rat(Color.White, new Vector2(100, 500));
 
             cam = new Camera2d();
             cam._pos.Y = -200;
+            cam._pos.X = 650;
             
             base.Initialize();
         }
@@ -53,6 +54,8 @@ namespace RatRunRacer
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("Fonts\\Font1");
+            TextManager.load(Content);
+            Lobby.load(Content);
             Rat.load(Content);
             MainMenu.load(Content);
             mainMenu.generateMenu();
@@ -67,36 +70,54 @@ namespace RatRunRacer
 
         protected override void Update(GameTime gameTime)
         {
-           
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
             KeyboardState ks = Keyboard.GetState();
-            myPlayer.update(World1);
-            mainMenu.Update();
-            cam._pos.X = myPlayer.pos.X;
 
-            if (myPlayer.pos.Y < 1235)
+            if (state == GameState.lobby)
             {
-                cam._pos.Y = myPlayer.pos.Y;
+                Lobby.Update();
             }
-            World1.update();
 
-            //Selection switch case for main menu
-            if (state == GameState.MMenu && ks.IsKeyDown(Keys.Enter))
+            if (state == GameState.playing)
             {
-                switch (mainMenu.getSelection())
+                myPlayer.update(World1);
+
+                if (myPlayer.pos.X > 650)
                 {
-                    case 1:
-                        state = GameState.lobby;
-                        break;
-                    case 2:
-                        state = GameState.playing;
-                        break;
-                    case 3:
-                        state = GameState.pause;
-                        break;
-                    default:
-                        break;
+                    cam._pos.X = myPlayer.pos.X;
+                }
+                else
+                {
+                    cam._pos.X = 650;
+                }
+                if (myPlayer.pos.Y < 1235)
+                {
+                    cam._pos.Y = myPlayer.pos.Y;
+                }
+                else
+                {
+                    cam._pos.Y = 1235;
+                }
+                World1.update();
+            }
+            //Selection switch case for main menu
+            if (state == GameState.MMenu)
+            {
+                mainMenu.Update();
+
+                if ( ks.IsKeyDown(Keys.Enter))
+                {
+                    switch (mainMenu.getSelection())
+                    {
+                        case 1:
+                            state = GameState.lobby;
+                            break;
+                        case 2:
+                            this.Exit();
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
 
@@ -106,15 +127,25 @@ namespace RatRunRacer
      
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.SkyBlue);
-
+            if (state == GameState.playing)
+            {
+                GraphicsDevice.Clear(Color.SkyBlue);
+            }
+            else
+            {
+                GraphicsDevice.Clear(new Color(30,30,30));
+            }
 
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend); //Start Hud draw
 
             if (state == GameState.MMenu)
             {
-                //spriteBatch.DrawString(font, "Jackson likes men a lot and he denies it", new Vector2(100, 100), new Color(255, 255, 255));
                 mainMenu.Draw(spriteBatch);
+            }
+
+            if (state == GameState.lobby)
+            {
+                Lobby.Draw(spriteBatch);
             }
             spriteBatch.End();//end HUD draw
 

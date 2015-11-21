@@ -21,32 +21,27 @@ namespace RatRunRacer{
 
         //tetures for buttons
         static Texture2D startTxt;
-        static Texture2D optionsTxt;
-        static Texture2D connectTxt;
+        static Texture2D exitTxt;
         static Texture2D selectArrow;
-        
+        static Texture2D background;
+
         //Button positions
         Vector2 startPos;
         Vector2 optionsPos;
-        Vector2 connectPos;
         Vector2 arrowPos;
 
         //Button areas
-        Rectangle startRec;
-        Rectangle optionRec;
-        Rectangle connectRec;
 
         //select value
         int selection;
         int counter;
         bool startWait;
 
-        public MainMenu(Vector2 sPos, Vector2 oPos, Vector2 cPos){
+        public MainMenu(Vector2 sPos, Vector2 oPos){
             startPos = sPos;
             optionsPos = oPos;
-            connectPos = cPos;
             buttonResult = "";
-            arrowPos = new Vector2(sPos.X,sPos.Y);
+            arrowPos = sPos;
             selection = 1;
             counter = 30;
             startWait = false;
@@ -55,19 +50,18 @@ namespace RatRunRacer{
 
         public static void load(ContentManager content)
         {
-            startTxt = content.Load<Texture2D>("Player\\rat");
-            optionsTxt = content.Load<Texture2D>("Player\\rat");
-            connectTxt = content.Load<Texture2D>("Player\\rat");
-            selectArrow = content.Load<Texture2D>("Icons\\arrow");
+            startTxt = content.Load<Texture2D>("Icons\\joingame");
+            exitTxt = content.Load<Texture2D>("Icons\\exitgame");
+            selectArrow = content.Load<Texture2D>("Icons\\select");
+            background = content.Load<Texture2D>("Icons\\backgroundtxt");
         }
 
 
         //Add all the buttons to main's arraylist of buttons
         public void generateMenu()
         {
-            main.addButton(startTxt, startPos, Color.Blue);
-            main.addButton(optionsTxt, optionsPos, Color.Green);
-            main.addButton(connectTxt, connectPos, Color.Purple);
+            main.addButton(startTxt, startPos, Color.White);
+            main.addButton(exitTxt, optionsPos, Color.White);
         }
 
         //get the selection
@@ -83,10 +77,14 @@ namespace RatRunRacer{
             KeyboardState keyState = Keyboard.GetState();
 
 
-            if (keyState.IsKeyDown(Keys.Down) && selection <= 3 && startWait != true)
+            if (keyState.IsKeyDown(Keys.Down) && startWait != true)
                 {
 
                     selection++;
+                    if (selection == 3)
+                    {
+                        selection = 1;
+                    }
 
                     switch (selection)
                     {
@@ -96,18 +94,17 @@ namespace RatRunRacer{
                         case 2:
                             arrowPos.Y = optionsPos.Y;
                             break;
-                        case 3:
-                            arrowPos.Y = connectPos.Y;
-                            break;
-                        default:
-                            break;
                     }
                     startWait = true;
                 }
 
-                if (keyState.IsKeyDown(Keys.Up) && selection >= 1 && startWait != true)
+                if (keyState.IsKeyDown(Keys.Up)  && startWait != true)
                 {
                     selection--;
+                    if (selection ==0)
+                    {
+                        selection = 2;
+                    }
                     switch (selection)
                     {
                         case 1:
@@ -116,18 +113,21 @@ namespace RatRunRacer{
                         case 2:
                             arrowPos.Y = optionsPos.Y;
                             break;
-                        case 3:
-                            arrowPos.Y = connectPos.Y;
-                            break;
-                        default:
-                            break;
                     }
                     startWait = true;
                 }
+
                 if(startWait == true)
                 {
                     counter--;
                 }
+
+                if (keyState.IsKeyUp(Keys.Up) && keyState.IsKeyUp(Keys.Down))
+                {
+                    counter = 30;
+                    startWait = false;
+                }
+
                 if (counter == 0)
                 {
                     counter = 30;
@@ -141,7 +141,8 @@ namespace RatRunRacer{
         public void Draw(SpriteBatch sb)
         {
             main.Draw(sb);
-            sb.Draw(selectArrow, arrowPos, null, Color.White, 0f, new Vector2(selectArrow.Width / 2, selectArrow.Height), 1f, SpriteEffects.None, .5f);
+            sb.Draw(selectArrow, arrowPos, null, Color.White, 0f, new Vector2(selectArrow.Width/2,0), 1f, SpriteEffects.None, .0f);
+            sb.Draw(background, new Vector2(420,210), null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 1f);
         }
 
     }

@@ -28,7 +28,7 @@ namespace RatRunRacer
 
         public void Draw(SpriteBatch sb)
         {
-            sb.Draw(butTxt, butPos, null, c, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, .4f);
+            sb.Draw(butTxt, butPos, null, c, 0f, new Vector2(butTxt.Width/2, 0), 1f, SpriteEffects.None, .4f);
         }
     }
 }
