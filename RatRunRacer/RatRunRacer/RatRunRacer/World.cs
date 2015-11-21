@@ -26,7 +26,7 @@ namespace RatRunRacer
             cloudTxt = content.Load<Texture2D>("Tiles\\Cloud");
             cloud2Txt = content.Load<Texture2D>("Tiles\\Cloud2");
             rockTxt = content.Load<Texture2D>("Tiles\\Rock");
-            level1Map = content.Load<Texture2D>("Levels\\Level1");
+            level1Map = content.Load<Texture2D>("Level\\Level1");
         }
 
         public World()

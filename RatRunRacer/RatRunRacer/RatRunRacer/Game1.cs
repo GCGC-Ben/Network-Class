@@ -42,7 +42,7 @@ namespace RatRunRacer
 
             myPlayer = new Rat(Color.White, new Vector2(0, -10));
             mainMenu = new MainMenu(new Vector2(640, 260), new Vector2(640, 360), new Vector2(640, 460));
-            myPlayer = new Rat(Color.White, new Vector2(200, 1050));
+            myPlayer = new Rat(Color.White, new Vector2(300, 100));
 
             cam = new Camera2d();
             cam._pos.Y = -200;
