@@ -89,9 +89,14 @@ namespace RatRunRacer
             {
                 pos = startPos;
             }
+            sendPosToServer();
 
         }
-
+        void sendPosToServer()
+        {
+            byte[] data = Encoding.ASCII.GetBytes("1$" + "x"+pos.X+"y"+pos.Y+"$"+username);
+            Lobby.strem.Write(data, 0, data.Length);
+        }
         void ResolveForces(World world1)
         {
             vel+= acc;

@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,17 +17,21 @@ namespace RatRunRacer
     {
         static Texture2D background;
         static SpriteFont font;
-        static Rat myp;
+        public static Rat myp ;
         static int select;
         static string serverIP ="";
         static int waitTime;
         static int state = 0;
+        static bool connected = false;
+        static TcpClient client;
+        static public NetworkStream strem;
+        static bool canPress;
 
         public static void load(ContentManager content)
         {
             background = content.Load<Texture2D>("Icons\\backgroundtxt");
             font = content.Load<SpriteFont>("Fonts\\Font1");
-            myp = new Rat(Color.White,new Vector2(0,0));
+            myp=new Rat(Color.White, new Vector2(100, 500));
         }
 
         public static bool Update()
@@ -72,10 +80,15 @@ namespace RatRunRacer
                 waitTime--;
             }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+            if (Keyboard.GetState().IsKeyDown(Keys.Enter)&&canPress)
             {
                 ConnectToServer();
                 state = 1;
+                canPress = false;
+            }
+            if (Keyboard.GetState().IsKeyUp(Keys.Enter))
+            {
+                canPress = true;
             }
 
             if (Keyboard.GetState().IsKeyUp(Keys.Down) && Keyboard.GetState().IsKeyUp(Keys.Up))
@@ -92,7 +105,83 @@ namespace RatRunRacer
 
         public static void ConnectToServer()
         {
+            Thread t = new Thread(readThread);
 
+            //s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            client = new TcpClient(AddressFamily.InterNetwork);
+            //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("10.90.121.94"), 20000);
+            //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 20000);
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse(serverIP), 20000);
+            try
+            {
+                //s.Connect(localEndPoint);
+                client.Connect(localEndPoint);
+                connected = true;
+                strem = client.GetStream();
+                t.Start();
+                byte[] data = Encoding.ASCII.GetBytes("0$"+myp.username);
+                strem.Write(data, 0, data.Length);
+            }
+            catch
+            {
+                if (connected)
+                {
+                    Console.WriteLine("Disconnceted from server");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to connect to server");
+                }
+            }
+        }
+
+       public static void readThread()
+        {
+            try
+            {
+                byte[] bytes = new byte[655357];
+                while (connected)
+                {
+                    NetworkStream stream = client.GetStream();
+                    int i;
+                    i = stream.Read(bytes, 0, bytes.Length);
+                   
+
+                        String str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        byte[] buffer;
+                        buffer = System.Text.Encoding.ASCII.GetBytes(str);
+
+                    string strData = Encoding.ASCII.GetString(buffer);
+
+                    try
+                    {
+                        string[] allData = strData.Split('$');
+                        if (OtherRats.Newrats.ContainsKey(allData[2]))
+                        {
+                            OtherRats.Newrats[allData.ElementAt(2)] = new Rat(Color.White,
+                              new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
+                                  (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
+                                  allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y') ))));
+                        }
+                        else
+                        {
+                            OtherRats.Newrats.Add(allData[2], new Rat(Color.White,
+                              new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
+                                  (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
+                                  allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y') )))));
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                   
+            }
+            catch
+            {
+                Console.WriteLine("Read failed");
+            }
         }
 
         public static void Draw(SpriteBatch sb)

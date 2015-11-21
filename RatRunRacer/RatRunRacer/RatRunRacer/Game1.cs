@@ -74,7 +74,11 @@ namespace RatRunRacer
 
             if (state == GameState.lobby)
             {
-                Lobby.Update();
+                if (Lobby.Update())
+                {
+                    myPlayer = Lobby.myp;
+                    state = GameState.playing;
+                }
             }
 
             if (state == GameState.playing)
@@ -156,6 +160,7 @@ namespace RatRunRacer
             {
                 myPlayer.draw(spriteBatch);
                 World1.draw(spriteBatch, cam.Pos);
+                OtherRats.draw(spriteBatch);
             }
             spriteBatch.End();//end game draw
 
