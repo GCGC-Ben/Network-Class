@@ -82,6 +82,8 @@
   <ItemGroup>
     <Compile Include="Icons\arrow.png">
       <Name>arrow</Name>
+    <Compile Include="Levels\Level1.png">
+      <Name>Level1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

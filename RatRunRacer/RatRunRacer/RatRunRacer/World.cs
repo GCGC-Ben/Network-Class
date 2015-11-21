@@ -13,6 +13,7 @@ namespace RatRunRacer
     class World
     {
         public static Texture2D dirtTxt,dirtBottemTxt,cloudTxt,cloud2Txt,rockTxt;
+        public static Texture2D level1Map;
         Random rand;
 
         List<Tile> allWorldTiles = new List<Tile>();
@@ -25,55 +26,41 @@ namespace RatRunRacer
             cloudTxt = content.Load<Texture2D>("Tiles\\Cloud");
             cloud2Txt = content.Load<Texture2D>("Tiles\\Cloud2");
             rockTxt = content.Load<Texture2D>("Tiles\\Rock");
+            level1Map = content.Load<Texture2D>("Levels\\Level1");
         }
 
         public World()
         {
             rand = new Random();
 
-            int size = 600;
-            for (int i = 0; i < size; i++) //generate bottem for whole map first
+            Color[] levelColors = new Color[200000];
+            level1Map.GetData(levelColors);
+
+            for (int y = 0; y < level1Map.Height; y++)
             {
-                Tile t = new Tile(new Vector2(16 * i, 0), dirtTxt);
-                allWorldTiles.Add(t);
-                solidTiles.Add(t);
-                
-                for (int i2 = 0; i2 < 16; i2++)
+                for(int x = 0; x<level1Map.Width; x++)
                 {
-                    allWorldTiles.Add(new Tile(new Vector2(16 * i, i2 * 16 + 16), dirtBottemTxt));
+                switch (levelColors[x+(y*level1Map.Width)].R)
+                {
+                    case 255:
+                        if (levelColors[x + (y * level1Map.Width)].G != 255)
+                        {
+                         allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),dirtTxt));
+                         solidTiles.Add(new Tile(new Vector2(x * 16, y * 16), dirtTxt));
+                        }
+                        else
+                        {
+                         allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),dirtBottemTxt));
+                        }
+                        break;
+                    case 0:
+                        if (levelColors[x + (y * level1Map.Width)].A == 255)
+                        {
+                            allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),dirtTxt));
+                            solidTiles.Add(new Tile(new Vector2(x * 16, y * 16), dirtTxt));
+                        }
+                        break;
                 }
-            }
-
-            for(int i = 0; i < size/2; i++) //Make clouds
-            {
-                if (rand.Next(100) < 20)
-                {
-                    if (rand.Next(3) > 1)
-                    {
-                        Tile t = new Tile(new Vector2(32 * i, -rand.Next(500) - 100), cloudTxt);
-                        allWorldTiles.Add(t);
-                    }
-                    else
-                    {
-                        Tile t = new Tile(new Vector2(32 * i, -rand.Next(500) - 100), cloud2Txt);
-                        allWorldTiles.Add(t);
-                    }
-                }
-            }
-
-            for (int i = 0; i < size; i++) //generate the platforms
-            {
-                if (rand.Next(100) < 10)
-                {
-                    int height = -rand.Next(200) - 20;
-                    for (int i2 = 0; i2 < 4; i2++)
-                    {
-                        Tile t = new Tile(new Vector2(16 * i, height), rockTxt);
-
-                        solidTiles.Add(t);
-                        allWorldTiles.Add(t);
-                        i++;
-                    }
                 }
             }
 

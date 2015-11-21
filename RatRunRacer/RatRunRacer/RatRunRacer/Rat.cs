@@ -19,6 +19,7 @@ namespace RatRunRacer
         bool onGround;
         Rectangle bb;
         bool facingRight;
+        bool justHitGround;
 
         public Rat(Color c, Vector2 startPos)
         {
@@ -37,11 +38,12 @@ namespace RatRunRacer
 
             bb = new Rectangle((int)pos.X-32,(int)pos.Y-16,64,17);
             onGround = false;
+            justHitGround = false;
             foreach (Tile t in world1.solidTiles) //super intensive consider a map
             {
                 if (pos.Y <= t.getBB().Bottom && t.getBB().Intersects(bb)&& vel.Y > 0)
                 {
-                    pos.Y = t.pos.Y;
+                    pos.Y = t.pos.Y;            
                     onGround = true;
                     vel.Y = 0;
                 }
@@ -75,13 +77,12 @@ namespace RatRunRacer
                 acc.Y += .3f;
                 onGround = false;
             }
-          
 
+            ResolveForces(world1);
 
-            ResolveForces();
         }
 
-        void ResolveForces()
+        void ResolveForces(World world1)
         {
             vel+= acc;
             acc = new Vector2(0, 0);
@@ -109,7 +110,30 @@ namespace RatRunRacer
                 vel.Y += .1f;
             }
 
-            pos += vel;
+            moveHere(pos + vel,world1);
+        }
+
+        void moveHere(Vector2 npos,World world1)
+        {
+            bool iCanMoveHere = true;
+
+            Rectangle nbb = new Rectangle((int)npos.X - 32, (int)npos.Y - 16, 64, 12);
+
+            if (!justHitGround) //skip this for when you hit the ground
+            {
+                foreach (Tile t in world1.solidTiles) //super intensive consider a map
+                {
+                    if (nbb.Intersects(t.getBB()))
+                    {
+                        iCanMoveHere = false;
+                        vel = new Vector2(0, 0);
+                    }
+                }
+            }
+            if (iCanMoveHere)
+            {
+                pos = npos;
+            }
         }
 
         public void draw(SpriteBatch sb)
