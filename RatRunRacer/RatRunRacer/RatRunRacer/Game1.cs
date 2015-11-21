@@ -65,7 +65,10 @@ namespace RatRunRacer
 
         protected override void UnloadContent()
         {
-
+            if (Lobby.readerThread != null)
+            {
+                Lobby.readerThread.Abort();//kill the thread 
+            }
         }
 
         protected override void Update(GameTime gameTime)

@@ -13,6 +13,7 @@ namespace RatRunRacer
     {
         public Vector2 pos;
         static Texture2D txt;
+        static SpriteFont font;
         Color c;
         Vector2 acc;
         Vector2 vel;
@@ -21,6 +22,7 @@ namespace RatRunRacer
         bool facingRight;
         bool justHitGround;
         Vector2 startPos;
+        public bool ratIsReady;
         public string username {get;set;} 
 
         public Rat(Color c, Vector2 startPos)
@@ -29,12 +31,13 @@ namespace RatRunRacer
             pos = startPos;
             this.startPos = startPos;
             username = "";
+            facingRight = true;
         }
 
         public static void load(ContentManager content)
         {
             txt = content.Load<Texture2D>("Player\\rat");
-            
+            font = content.Load<SpriteFont>("Fonts\\Font1");
         }
 
         public void update(World world1)
@@ -89,14 +92,31 @@ namespace RatRunRacer
             {
                 pos = startPos;
             }
-            sendPosToServer();
-
+            if (Lobby.connected)
+            {
+                sendPosToServer();
+            }
         }
-        void sendPosToServer()
+        void sendPosToServer() //think about giving this its own thread as to not lag your game
         {
-            byte[] data = Encoding.ASCII.GetBytes("1$" + "x"+pos.X+"y"+pos.Y+"$"+username);
+            byte[] data = Encoding.ASCII.GetBytes("1$" + "x"+pos.X+"y"+pos.Y+"$"+username+"$");
             Lobby.strem.Write(data, 0, data.Length);
         }
+
+        public void sendLobbyInfoToServer()
+        {
+            byte[] data;
+            if (ratIsReady)
+            {
+                data = Encoding.ASCII.GetBytes("2$" +"Y"+"$" + username + "$");
+            }
+            else
+            {
+                data = Encoding.ASCII.GetBytes("2$" +"N"+ "$" + username + "$");
+            }
+            Lobby.strem.Write(data, 0, data.Length);
+        }
+
         void ResolveForces(World world1)
         {
             vel+= acc;
@@ -159,6 +179,7 @@ namespace RatRunRacer
             }
             else
             {
+                sb.DrawString(font, username, pos + new Vector2(0, -30), Color.White, 0, new Vector2(font.MeasureString(username).X / 2, 0), 1f, SpriteEffects.None, 0);
                 sb.Draw(txt, pos, null, c, 0f, new Vector2(txt.Width / 2, txt.Height), 1f, SpriteEffects.FlipHorizontally, .5f);
             }
             //sb.Draw(txt, bb, Color.Red); // debuging bounding box

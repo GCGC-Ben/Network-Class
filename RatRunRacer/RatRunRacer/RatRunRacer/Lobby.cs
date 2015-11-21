@@ -22,10 +22,12 @@ namespace RatRunRacer
         static string serverIP ="";
         static int waitTime;
         static int state = 0;
-        static bool connected = false;
+        public static bool connected = false;
         static TcpClient client;
         static public NetworkStream strem;
         static bool canPress;
+        public static Thread readerThread;
+        static int amountrdy;
 
         public static void load(ContentManager content)
         {
@@ -100,12 +102,37 @@ namespace RatRunRacer
         }
         public static bool waiting()
         {
-            return true;
+            if (Keyboard.GetState().IsKeyDown(Keys.R))
+            {
+                myp.ratIsReady = true;
+                myp.sendLobbyInfoToServer();
+            }
+
+
+            amountrdy = 0;
+            OtherRats.allrats = OtherRats.Newrats;
+            foreach (KeyValuePair<string, Rat> r in OtherRats.allrats)
+            {
+                if (r.Value.ratIsReady)
+                {
+                    amountrdy++;
+                }
+            }
+            if (myp.ratIsReady)
+            {
+                amountrdy++;
+            }
+            if (amountrdy > OtherRats.allrats.Count)
+            {
+                return true;
+            }
+   
+            return false;
         }
 
         public static void ConnectToServer()
         {
-            Thread t = new Thread(readThread);
+            readerThread = new Thread(readThread);
 
             //s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             client = new TcpClient(AddressFamily.InterNetwork);
@@ -118,7 +145,7 @@ namespace RatRunRacer
                 client.Connect(localEndPoint);
                 connected = true;
                 strem = client.GetStream();
-                t.Start();
+                readerThread.Start();
                 byte[] data = Encoding.ASCII.GetBytes("0$"+myp.username);
                 strem.Write(data, 0, data.Length);
             }
@@ -127,6 +154,7 @@ namespace RatRunRacer
                 if (connected)
                 {
                     Console.WriteLine("Disconnceted from server");
+                    connected = false;
                 }
                 else
                 {
@@ -142,33 +170,57 @@ namespace RatRunRacer
                 byte[] bytes = new byte[655357];
                 while (connected)
                 {
-                    NetworkStream stream = client.GetStream();
-                    int i;
-                    i = stream.Read(bytes, 0, bytes.Length);
-                   
+                    try
+                    {
+                        NetworkStream stream = client.GetStream();
+                        int i;
+                        i = stream.Read(bytes, 0, bytes.Length);
+
 
                         String str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                         byte[] buffer;
                         buffer = System.Text.Encoding.ASCII.GetBytes(str);
 
-                    string strData = Encoding.ASCII.GetString(buffer);
+                        string strData = Encoding.ASCII.GetString(buffer);
 
-                    try
-                    {
                         string[] allData = strData.Split('$');
-                        if (OtherRats.Newrats.ContainsKey(allData[2]))
+                        if (allData[0] == "0")
                         {
-                            OtherRats.Newrats[allData.ElementAt(2)] = new Rat(Color.White,
-                              new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
-                                  (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
-                                  allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y') ))));
+                            if (!OtherRats.Newrats.ContainsKey(allData[1]))
+                            {
+                                OtherRats.Newrats.Add(allData[1], new Rat(Color.White, new Vector2(0, 0)));
+                            }
                         }
-                        else
+                        if (allData[0] == "1")
                         {
-                            OtherRats.Newrats.Add(allData[2], new Rat(Color.White,
-                              new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
-                                  (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
-                                  allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y') )))));
+                            if (OtherRats.Newrats.ContainsKey(allData[2]))
+                            {
+                                OtherRats.Newrats[allData.ElementAt(2)] = new Rat(Color.White,
+                                  new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
+                                      (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
+                                      allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y')))));
+                            }
+                            else
+                            {
+                                OtherRats.Newrats.Add(allData[2], new Rat(Color.White,
+                                  new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
+                                      (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
+                                      allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y'))))));
+                            }
+                        }
+                        else if (allData[0] == "2")
+                        {
+                            if (!OtherRats.Newrats.ContainsKey(allData[2]))
+                            {
+                                OtherRats.Newrats.Add(allData[2], new Rat(Color.White, new Vector2(0, 0)));
+                            }
+                            else
+                            {
+                                if(allData[1] == "Y")
+                                {
+                                    OtherRats.Newrats[allData[2]].ratIsReady = true;
+                                }
+                            }
                         }
                     }
                     catch
@@ -176,7 +228,6 @@ namespace RatRunRacer
 
                     }
                 }
-                   
             }
             catch
             {
@@ -186,22 +237,37 @@ namespace RatRunRacer
 
         public static void Draw(SpriteBatch sb)
         {
-            if (select == 0)
+            if (state == 0)
             {
-                sb.DrawString(font, "IP: " + serverIP, new Vector2(640, 300), Color.White, 0f,
-                    new Vector2(font.MeasureString("IP: " + serverIP).X / 2, 0), 1f, SpriteEffects.None, 0f);
-                sb.DrawString(font, "UserName: "+ myp.username, new Vector2(640, 400), new Color(200,200,200), 0f, 
-                    new Vector2(font.MeasureString("UserName: "+myp.username).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                if (select == 0)
+                {
+                    sb.DrawString(font, "IP: " + serverIP, new Vector2(640, 300), Color.White, 0f,
+                        new Vector2(font.MeasureString("IP: " + serverIP).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                    sb.DrawString(font, "UserName: " + myp.username, new Vector2(640, 400), new Color(200, 200, 200), 0f,
+                        new Vector2(font.MeasureString("UserName: " + myp.username).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                }
+                else
+                {
+                    sb.DrawString(font, "IP: " + serverIP, new Vector2(640, 300), new Color(200, 200, 200), 0f,
+                        new Vector2(font.MeasureString("IP: " + serverIP).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                    sb.DrawString(font, "UserName: " + myp.username, new Vector2(640, 400), Color.White, 0f,
+                        new Vector2(font.MeasureString("UserName: " + myp.username).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                }
+                sb.DrawString(font, "Press ENTER To Connect to server", new Vector2(640, 600),
+                    Color.White, 0f, new Vector2(font.MeasureString("Press ENTER To Connect to server").X / 2, 0), 1f, SpriteEffects.None, 0f);
             }
-            else 
+            else
             {
-                sb.DrawString(font, "IP: " + serverIP, new Vector2(640, 300), new Color(200, 200, 200), 0f, 
-                    new Vector2(font.MeasureString("IP: " + serverIP).X / 2, 0), 1f, SpriteEffects.None, 0f);
-                sb.DrawString(font,"UserName: " + myp.username, new Vector2(640, 400), Color.White, 0f, 
-                    new Vector2(font.MeasureString("UserName: "+myp.username).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                sb.DrawString(font, "Press R to Ready Up", new Vector2(640, 300),
+                    Color.White, 0f, new Vector2(font.MeasureString("Press R To Ready Up").X / 2, 0), 1f, SpriteEffects.None, 0f);
+
+                sb.DrawString(font, amountrdy+"/"+(OtherRats.allrats.Count+1)+" Players Ready", new Vector2(640, 350),
+                    Color.White, 0f, new Vector2(font.MeasureString(amountrdy + "/" + (OtherRats.allrats.Count + 1) + " Players Ready").X / 2, 0), 1f, SpriteEffects.None, 0f);
+
+                sb.DrawString(font, "Connected To Server Waiting on players", new Vector2(640, 600),
+                   Color.White, 0f, new Vector2(font.MeasureString("Connected To Server Waiting on players").X / 2, 0), 1f, SpriteEffects.None, 0f);
             }
-            sb.DrawString(font, "Press ENTER To Connect to server", new Vector2(640, 600),
-                Color.White, 0f, new Vector2(font.MeasureString("Press ENTER To Connect to server").X / 2, 0), 1f, SpriteEffects.None, 0f);
+
 
             sb.Draw(background, new Vector2(420, 210), null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 1f);
         }
