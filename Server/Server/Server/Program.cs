@@ -14,19 +14,23 @@ namespace Server
         static byte[] buffer;
         static int clientsConnected;
         static Socket s;
-        static List<Socket> allSockets = new List<Socket>();
+        static List<TcpClient> allSockets = new List<TcpClient>();
 
         static void Main(string[] args)
         {
 
-            s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            s.Bind(new IPEndPoint(0, 20000));
+            //s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //s.Bind(new IPEndPoint(0, 20000));
+            IPEndPoint end = new IPEndPoint(0,20000);
+            TcpListener listen = new TcpListener(end);
 
             while (true)
             {
-                s.Listen(100);
-                Socket accepted = s.Accept();
-                allSockets.Add(accepted);
+                listen.Start(100);
+                //Socket accepted = s.Accept();
+                //allSockets.Add(accepted);
+                TcpClient client = listen.AcceptTcpClient();
+                allSockets.Add(client);
                 clientsConnected++;
                 Console.WriteLine(clientsConnected + " Clients");
                 Thread t = new Thread(newUser);
@@ -41,32 +45,39 @@ namespace Server
 
         public static void newUser()
         {
-            Socket accepted = allSockets.ElementAt(clientsConnected - 1);
-            bool exit = false;
+            //Socket accepted = allSockets.ElementAt(clientsConnected - 1);
+            TcpClient accepted = allSockets.ElementAt(clientsConnected -1);
+            NetworkStream strem = accepted.GetStream();
+            byte[] bytes = new byte[655357];
+           
+            int i;
+            string str;
             try
             {
-                while (!exit)
+                while ((i = strem.Read(bytes, 0, bytes.Length))!=0)
                 {
-                    buffer = new byte[accepted.SendBufferSize];
-                    int bytesRead = accepted.Receive(buffer);
+                    str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                    Console.WriteLine("Recieved: " + str);
+                    //buffer = new byte[accepted.ReceiveBufferSize];
+                    //int bytesRead = strem.;
 
-                    byte[] formatted = new byte[bytesRead];
+                    str = str.ToUpper();
 
-                    for (int i = 0; i < bytesRead; i++)
+                    byte[] formatted = System.Text.Encoding.ASCII.GetBytes(str);
+                    //strem.Read(buffer,0, accepted.ReceiveBufferSize);
+
+                    //string strData = Encoding.ASCII.GetString(buffer);
+
+                    foreach (TcpClient s in allSockets)
                     {
-                        formatted[i] = buffer[i];
-                    }
-                    string strData = Encoding.ASCII.GetString(formatted);
-
-                    foreach (Socket s in allSockets)
-                    {
+                        NetworkStream eachStrem = s.GetStream();
                         if (s != accepted)//don't send to self
                         {
-                            s.Send(formatted);
+                            eachStrem.Write(formatted,0,formatted.Length);
                         }
                     }
 
-                    Console.WriteLine(strData);
+                    Console.WriteLine();
                 }
             }
             catch

@@ -15,16 +15,22 @@ namespace Client
         static Socket s;
         static bool connected;
        
+        static TcpClient client;
         static void Main(string[] args)
         {
             Thread t = new Thread(readThread);
-            s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
+            //s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            client = new TcpClient(AddressFamily.InterNetwork);
+            //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("10.90.122.109"), 20000);
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 20000);
-
+            NetworkStream strem;
             try
             {
-                s.Connect(localEndPoint);
+                //s.Connect(localEndPoint);
+                client.Connect(localEndPoint);
                 connected = true;
+                strem = client.GetStream();
                 t.Start();
 
                 Console.Write("Enter your name: ");
@@ -42,7 +48,7 @@ namespace Client
 
                     byte[] data = Encoding.ASCII.GetBytes(text);
 
-                    s.Send(data);
+                    strem.Write(data, 0, data.Length);
                 }
             }
             catch
@@ -58,29 +64,32 @@ namespace Client
             }
             connected = false;
             Console.Read();
-            s.Close();
-
+          
+            client.Close();
         }
 
         public static void readThread()
         {
             try
             {
+                byte[] bytes = new byte[655357];
                 while (connected)
                 {
-                    byte[] buffer;
-                    buffer = new byte[s.SendBufferSize];
-                    int bytesRead = s.Receive(buffer);
+                    NetworkStream stream = client.GetStream();
+                    int i;
+                    i = stream.Read(bytes, 0, bytes.Length);
+                   
 
-                    byte[] formatted = new byte[bytesRead];
+                        String str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                        byte[] buffer;
+                        buffer = System.Text.Encoding.ASCII.GetBytes(str);
+                        int bytesRead = client.ReceiveBufferSize;
 
-                    for (int i = 0; i < bytesRead; i++)
-                    {
-                        formatted[i] = buffer[i];
-                    }
-                    string strData = Encoding.ASCII.GetString(formatted);
-                    Console.WriteLine(strData);
+                        string strData = Encoding.ASCII.GetString(buffer);
+                        Console.WriteLine(strData);
+                    
                 }
+                   
             }
             catch
             {
