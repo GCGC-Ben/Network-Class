@@ -33,7 +33,8 @@ namespace RatRunRacer
         {
             background = content.Load<Texture2D>("Icons\\backgroundtxt");
             font = content.Load<SpriteFont>("Fonts\\Font1");
-            myp=new Rat(Color.White, new Vector2(100, 500));
+            myp=new Rat(Color.White, new Vector2(100, 500),new Vector2(0,0));
+            myp.makePlayerControled();
         }
 
         public static bool Update()
@@ -127,7 +128,7 @@ namespace RatRunRacer
                 return true;
             }
    
-            return false;
+            return true;
         }
 
         public static void ConnectToServer()
@@ -188,31 +189,37 @@ namespace RatRunRacer
                         {
                             if (!OtherRats.Newrats.ContainsKey(allData[1]))
                             {
-                                OtherRats.Newrats.Add(allData[1], new Rat(Color.White, new Vector2(0, 0)));
+                                OtherRats.Newrats.Add(allData[1], new Rat(Color.White, new Vector2(0, 0),new Vector2(0,0)));
                             }
                         }
                         if (allData[0] == "1")
                         {
-                            if (OtherRats.Newrats.ContainsKey(allData[2]))
+                            if (OtherRats.Newrats.ContainsKey(allData[3]))
                             {
-                                OtherRats.Newrats[allData.ElementAt(2)] = new Rat(Color.White,
+                                OtherRats.Newrats[allData.ElementAt(3)] = new Rat(Color.White,
                                   new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
-                                      allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y')))));
+                                      allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y')))), 
+                                      new Vector2((float)Convert.ToDouble(allData.ElementAt(2).Substring(1, allData.ElementAt(2).IndexOf('Y') - 1)),
+                                      (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
+                                      allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y')))));
                             }
                             else
                             {
-                                OtherRats.Newrats.Add(allData[2], new Rat(Color.White,
+                                OtherRats.Newrats.Add(allData[3], new Rat(Color.White,
                                   new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
-                                      allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y'))))));
+                                      allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y')))), 
+                                      new Vector2((float)Convert.ToDouble(allData.ElementAt(2).Substring(1, allData.ElementAt(2).IndexOf('Y') - 1)),
+                                      (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
+                                      allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y'))))));
                             }
                         }
                         else if (allData[0] == "2")
                         {
                             if (!OtherRats.Newrats.ContainsKey(allData[2]))
                             {
-                                OtherRats.Newrats.Add(allData[2], new Rat(Color.White, new Vector2(0, 0)));
+                                OtherRats.Newrats.Add(allData[2], new Rat(Color.White, new Vector2(0, 0),new Vector2(0,0)));
                             }
                             else
                             {

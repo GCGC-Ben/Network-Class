@@ -12,9 +12,19 @@ namespace RatRunRacer
         public static Dictionary<string, Rat> Newrats = new Dictionary<string, Rat>();
         public static Dictionary<string,Rat> allrats = new Dictionary<string,Rat>();
 
-        public void update()
+        public static void update(World world1)
         {
+            try
+            {
+                foreach (KeyValuePair<string, Rat> r in allrats)
+                {
+                    r.Value.update(world1);
+                }
+            }
+            catch
+            {
 
+            }
         }
         public static void draw(SpriteBatch sb)
         {

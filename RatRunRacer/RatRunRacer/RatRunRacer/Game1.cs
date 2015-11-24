@@ -41,7 +41,7 @@ namespace RatRunRacer
             graphics.ApplyChanges();
 
             mainMenu = new MainMenu(new Vector2(640, 280), new Vector2(640, 380));
-            myPlayer = new Rat(Color.White, new Vector2(100, 500));
+            myPlayer = new Rat(Color.White, new Vector2(100, 500),new Vector2(0,0));
 
             cam = new Camera2d();
             cam._pos.Y = -200;
@@ -87,6 +87,7 @@ namespace RatRunRacer
             if (state == GameState.playing)
             {
                 myPlayer.update(World1);
+                OtherRats.update(World1);
 
                 if (myPlayer.pos.X > 650)
                 {
