@@ -41,7 +41,7 @@ namespace RatRunRacer
             graphics.ApplyChanges();
 
             mainMenu = new MainMenu(new Vector2(640, 280), new Vector2(640, 380));
-            myPlayer = new Rat(Color.White, new Vector2(100, 500));
+            myPlayer = new Rat(Color.White, new Vector2(100, 500),new Vector2(0,0));
 
             cam = new Camera2d();
             cam._pos.Y = -200;
@@ -65,7 +65,10 @@ namespace RatRunRacer
 
         protected override void UnloadContent()
         {
-
+            if (Lobby.readerThread != null)
+            {
+                Lobby.readerThread.Abort();//kill the thread 
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -74,12 +77,17 @@ namespace RatRunRacer
 
             if (state == GameState.lobby)
             {
-                Lobby.Update();
+                if (Lobby.Update())
+                {
+                    myPlayer = Lobby.myp;
+                    state = GameState.playing;
+                }
             }
 
             if (state == GameState.playing)
             {
                 myPlayer.update(World1);
+                OtherRats.update(World1);
 
                 if (myPlayer.pos.X > 650)
                 {
@@ -156,6 +164,7 @@ namespace RatRunRacer
             {
                 myPlayer.draw(spriteBatch);
                 World1.draw(spriteBatch, cam.Pos);
+                OtherRats.draw(spriteBatch);
             }
             spriteBatch.End();//end game draw
 

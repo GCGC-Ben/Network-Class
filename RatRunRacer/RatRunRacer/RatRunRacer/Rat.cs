@@ -13,6 +13,7 @@ namespace RatRunRacer
     {
         public Vector2 pos;
         static Texture2D txt;
+        static SpriteFont font;
         Color c;
         Vector2 acc;
         Vector2 vel;
@@ -21,24 +22,34 @@ namespace RatRunRacer
         bool facingRight;
         bool justHitGround;
         Vector2 startPos;
-        public string username {get;set;} 
+        public bool ratIsReady;
+        public string username {get;set;}
+        bool isControled;
 
-        public Rat(Color c, Vector2 startPos)
+        public Rat(Color c, Vector2 startPos,Vector2 cVel)
         {
             this.c = c;
             pos = startPos;
             this.startPos = startPos;
             username = "";
+            facingRight = true;
+            vel = cVel;
         }
 
         public static void load(ContentManager content)
         {
             txt = content.Load<Texture2D>("Player\\rat");
-            
+            font = content.Load<SpriteFont>("Fonts\\Font1");
+        }
+
+        public void makePlayerControled()
+        {
+            isControled = true;
         }
 
         public void update(World world1)
         {
+
             KeyboardState kb = Keyboard.GetState();
 
             bb = new Rectangle((int)pos.X-32,(int)pos.Y-16,64,17);
@@ -59,22 +70,24 @@ namespace RatRunRacer
                 }
             }
 
+            if (isControled)
+            {
+                if (kb.IsKeyDown(Keys.Right))
+                {
+                    acc.X += .2f;
+                    facingRight = true;
+                }
+                if (kb.IsKeyDown(Keys.Left))
+                {
+                    acc.X -= .2f;
+                    facingRight = false;
+                }
 
-            if (kb.IsKeyDown(Keys.Right))
-            {
-                acc.X += .2f;
-                facingRight = true;
-            }
-            if (kb.IsKeyDown(Keys.Left))
-            {
-                acc.X -= .2f;
-                facingRight = false;
-            }
-
-            if ((kb.IsKeyDown(Keys.Space)||kb.IsKeyDown(Keys.Up)) && onGround)
-            {
-                acc.Y = -13f;
-                onGround = false;
+                if ((kb.IsKeyDown(Keys.Space) || kb.IsKeyDown(Keys.Up)) && onGround)
+                {
+                    acc.Y = -13f;
+                    onGround = false;
+                }
             }
 
             if (!onGround)
@@ -89,7 +102,29 @@ namespace RatRunRacer
             {
                 pos = startPos;
             }
+            if (Lobby.connected &&isControled)
+            {
+                sendPosToServer();
+            }
+        }
+        void sendPosToServer() //think about giving this its own thread as to not lag your game
+        {
+            byte[] data = Encoding.ASCII.GetBytes("1$" + "x"+pos.X+"y"+pos.Y+"$"+"x"+vel.X+"y"+vel.Y+"$"+username+"$");
+            Lobby.strem.Write(data, 0, data.Length);
+        }
 
+        public void sendLobbyInfoToServer()
+        {
+            byte[] data;
+            if (ratIsReady)
+            {
+                data = Encoding.ASCII.GetBytes("2$" +"Y"+"$" + username + "$");
+            }
+            else
+            {
+                data = Encoding.ASCII.GetBytes("2$" +"N"+ "$" + username + "$");
+            }
+            Lobby.strem.Write(data, 0, data.Length);
         }
 
         void ResolveForces(World world1)
@@ -156,6 +191,8 @@ namespace RatRunRacer
             {
                 sb.Draw(txt, pos, null, c, 0f, new Vector2(txt.Width / 2, txt.Height), 1f, SpriteEffects.FlipHorizontally, .5f);
             }
+            sb.DrawString(font, username, pos + new Vector2(0, -90), Color.White, 0, new Vector2(font.MeasureString(username).X / 2, 0), 1f, SpriteEffects.None, 0);
+
             //sb.Draw(txt, bb, Color.Red); // debuging bounding box
         }
 

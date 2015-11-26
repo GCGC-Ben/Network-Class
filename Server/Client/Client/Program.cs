@@ -22,8 +22,8 @@ namespace Client
             
             //s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             client = new TcpClient(AddressFamily.InterNetwork);
-            //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("10.90.122.109"), 20000);
-            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 20000);
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("10.90.120.81"), 20000);
+            //IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 20000);
             NetworkStream strem;
             try
             {
