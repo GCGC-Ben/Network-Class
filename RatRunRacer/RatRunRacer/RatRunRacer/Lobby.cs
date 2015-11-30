@@ -203,6 +203,7 @@ namespace RatRunRacer
                                       new Vector2((float)Convert.ToDouble(allData.ElementAt(2).Substring(1, allData.ElementAt(2).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
                                       allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y')))));
+
                             }
                             else
                             {
@@ -213,6 +214,8 @@ namespace RatRunRacer
                                       new Vector2((float)Convert.ToDouble(allData.ElementAt(2).Substring(1, allData.ElementAt(2).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
                                       allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y'))))));
+                                
+                                 OtherRats.Newrats[allData.ElementAt(3)].username = allData[3];
                             }
                         }
                         else if (allData[0] == "2")

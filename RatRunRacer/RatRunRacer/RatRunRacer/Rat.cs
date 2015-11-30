@@ -25,6 +25,7 @@ namespace RatRunRacer
         public bool ratIsReady;
         public string username {get;set;}
         bool isControled;
+        bool iFinshed = false;
 
         public Rat(Color c, Vector2 startPos,Vector2 cVel)
         {
@@ -70,7 +71,7 @@ namespace RatRunRacer
                 }
             }
 
-            if (isControled)
+            if (isControled &&!iFinshed)
             {
                 if (kb.IsKeyDown(Keys.Right))
                 {
@@ -102,14 +103,38 @@ namespace RatRunRacer
             {
                 pos = startPos;
             }
+
             if (Lobby.connected &&isControled)
             {
-                sendPosToServer();
+                if (!iFinshed)
+                {
+                    foreach (Tile t in world1.finshLine)
+                    {
+                        if (bb.Intersects(t.getBB()))
+                        {
+                            iFinshed = true;
+                            sendIFinshed();
+                        }
+                    }
+                    sendPosToServer();
+                }
+                else
+                {
+                    sendIFinshed();
+                }
             }
         }
         void sendPosToServer() //think about giving this its own thread as to not lag your game
         {
-            byte[] data = Encoding.ASCII.GetBytes("1$" + "x"+pos.X+"y"+pos.Y+"$"+"x"+vel.X+"y"+vel.Y+"$"+username+"$");
+            byte[] data;
+            if (facingRight)
+            {
+               data = Encoding.ASCII.GetBytes("1$" + "x" + pos.X + "y" + pos.Y + "$" + "x" + vel.X + "y" + vel.Y + "$" + "R" + "$" + username + "$");
+            }
+            else
+            {
+               data = Encoding.ASCII.GetBytes("1$" + "x" + pos.X + "y" + pos.Y + "$" + "x" + vel.X + "y" + vel.Y + "$" + "L" + "$" + username + "$");
+            }
             Lobby.strem.Write(data, 0, data.Length);
         }
 
@@ -124,6 +149,15 @@ namespace RatRunRacer
             {
                 data = Encoding.ASCII.GetBytes("2$" +"N"+ "$" + username + "$");
             }
+            Lobby.strem.Write(data, 0, data.Length);
+        }
+
+        //tell the server you hit the finsh line
+        public void sendIFinshed()
+        {
+            byte[] data;
+            data = Encoding.ASCII.GetBytes("3$" + "F" + "$" + username + "$");
+
             Lobby.strem.Write(data, 0, data.Length);
         }
 

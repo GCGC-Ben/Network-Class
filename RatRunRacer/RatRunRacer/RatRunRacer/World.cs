@@ -17,6 +17,7 @@ namespace RatRunRacer
         Random rand;
 
         List<Tile> allWorldTiles = new List<Tile>();
+        public List<Tile> finshLine = new List<Tile>();
         public List<Tile> solidTiles = new List<Tile>();
 
         public static void load(ContentManager content)
@@ -60,6 +61,7 @@ namespace RatRunRacer
 
                     case 200:
                          allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),flTxt));
+                         finshLine.Add(new Tile(new Vector2(x * 16, y * 16), flTxt));
                         break;
 
                     case 0:
