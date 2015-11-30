@@ -26,74 +26,20 @@ namespace Server
             while (true)
             {
                 listen.Start(100);
-                //Socket accepted = s.Accept();
-                //allSockets.Add(accepted);
                 TcpClient client = listen.AcceptTcpClient();
                 allSockets.Add(client);
                 clientsConnected++;
                 Console.WriteLine(clientsConnected + " Clients");
                 Thread t = new Thread(threadRun);
-                Thread r = new Thread(lobbyCheck);
-                //r.Start();
-                //if (readToGo)
-                //{
-                   
-                    t.Start();
-                //}
+               
+                t.Start();
+                
                 Console.WriteLine("Client Connected");
             }
             Console.Read();
         }
 
-        public static void lobbyCheck()
-        {
-            Console.WriteLine();
-            TcpClient accepted = allSockets.ElementAt(clientsConnected - 1);
-            NetworkStream strem = accepted.GetStream();
-            byte[] bytes = new byte[655357];
-            
-
-            int i;
-
-            string str;
-
-            try
-            {
-                while ((i = strem.Read(bytes, 0, bytes.Length)) != 0)
-                {
-
-                    str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine("Recieved: " + str);
-
-                    str = str.ToUpper();
-
-                    string[] recMessage = str.Split('$');
-
-                    if (recMessage[1] == "Y" && !ready.Contains(recMessage[2]))
-                    {
-                        ready.Add(recMessage[2]);
-                        numReady++;
-                    }
-                    if (numReady == clientsConnected)
-                    {
-                        string start = "Start Game";
-                        byte[] startBytes = System.Text.Encoding.ASCII.GetBytes(start);
-                        foreach (TcpClient s in allSockets)
-                        {
-                            NetworkStream eachStrem = s.GetStream();
-                            if (s != accepted)//don't send to self
-                            {
-                                eachStrem.Write(startBytes, 0, startBytes.Length);
-                            }
-                        }
-                        readyToGo = true;
-                    }
-                }
-            }
-            catch
-            {
-            }
-        }
+       
 
         public static void threadRun()
         {
@@ -114,14 +60,18 @@ namespace Server
                     Console.WriteLine("Recieved: " + str);
 
                     str = str.ToUpper();
-                    byte[] formatted = System.Text.Encoding.ASCII.GetBytes(str);            
 
-                    foreach (TcpClient s in allSockets)
+                    byte[] formatted = System.Text.Encoding.ASCII.GetBytes(str);
+
+                    if (readyToGo)
                     {
-                        NetworkStream eachStrem = s.GetStream();
-                        if (s != accepted)//don't send to self
+                        foreach (TcpClient s in allSockets)
                         {
-                            eachStrem.Write(formatted,0,formatted.Length);
+                            NetworkStream eachStrem = s.GetStream();
+                            if (s != accepted)//don't send to self
+                            {
+                                eachStrem.Write(formatted, 0, formatted.Length);
+                            }
                         }
                     }
                     if(readyToGo == false)
@@ -131,28 +81,38 @@ namespace Server
                         if (recMessage[1] == "Y" && !ready.Contains(recMessage[2]))
                         {
                             ready.Add(recMessage[2]);
-                            users.Add(username, new ClientUser());
                             username = recMessage[2];
+                            users.Add(username, new ClientUser());
+                            
                             numReady++;
-                            foreach (KeyValuePair<string, ClientUser> u in users)
-                            {
-                                u.Value.setState(4);
-                            }
+                            
                         }
                         if (numReady == clientsConnected)
                         {
-                            string start = ("4$"+username+"$");
+                            string start = ("4$$");
                             int allReady = 0;
                             byte[] startBytes = System.Text.Encoding.ASCII.GetBytes(start);
 
                             foreach (TcpClient s in allSockets)
                             {
                                 NetworkStream eachStrem = s.GetStream();
-                                if (s != accepted)//don't send to self
+                           
+                                eachStrem.Write(startBytes, 0, startBytes.Length);
+                                string temp = str;
+                                string[] check = temp.Split('$');
+
+                                if (check[0] == "1")
                                 {
-                                    eachStrem.Write(startBytes, 0, startBytes.Length);
+                                    if (users[check[3]].getState() != 4)
+                                    {
+                                        users[check[3]].setState(4);
+                                    }
                                 }
                             }
+
+                            //check to see if trasmitting movement data
+                           
+
                             foreach (KeyValuePair<string, ClientUser> u in users)
                             {
                                 if (u.Value.getState() == 4)
@@ -164,10 +124,8 @@ namespace Server
                             if (allReady == clientsConnected)
                             {
                                 readyToGo = true;
-                            }
-                           
-                            //readyToGo = true;
-                        }
+                            }  
+                       }
                     }
                     Console.WriteLine();
                 }

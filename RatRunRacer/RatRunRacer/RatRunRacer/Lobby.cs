@@ -109,22 +109,18 @@ namespace RatRunRacer
             {
                 myp.ratIsReady = true;
                 myp.sendLobbyInfoToServer();
-                amountrdy++;
             }
-
-            NetworkStream testStrem = client.GetStream();
-            byte[] bytes = new byte[655357];
             //int x = testStrem.Read(bytes, 0, bytes.Length);
 
             //amountrdy = 0;
-            //OtherRats.allrats = OtherRats.Newrats;
-            //foreach (KeyValuePair<string, Rat> r in OtherRats.allrats)
-            //{
-            //    if (r.Value.ratIsReady)
-            //    {
-            //        amountrdy++;
-            //    }
-            //}
+            OtherRats.allrats = OtherRats.Newrats;
+            foreach (KeyValuePair<string, Rat> r in OtherRats.allrats)
+            {
+                if (r.Value.ratIsReady)
+                {
+                    amountrdy++;
+                }
+            }
             //if (myp.ratIsReady)
             //{
             //    amountrdy++;
