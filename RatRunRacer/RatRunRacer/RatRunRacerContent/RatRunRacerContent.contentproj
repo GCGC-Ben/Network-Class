@@ -87,8 +87,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Level\Level1.png">
-      <Name>Level1</Name>
+    <Compile Include="Level\Level2.png">
+      <Name>Level2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -138,6 +138,13 @@
   <ItemGroup>
     <Compile Include="Icons\backgroundtxt.png">
       <Name>backgroundtxt</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Level\level1.png">
+      <Name>level1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
