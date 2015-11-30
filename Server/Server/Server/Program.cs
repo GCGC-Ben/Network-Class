@@ -11,19 +11,18 @@ namespace Server
 {
     class Program
     {
-        static byte[] buffer;
         static int clientsConnected;
-        static Socket s;
         static List<TcpClient> allSockets = new List<TcpClient>();
+        static Dictionary<string, ClientUser> users = new Dictionary<string, ClientUser>();
+        static int numReady = 0;
+        static bool readyToGo = false;
+        static List<string> ready = new List<string>();
 
         static void Main(string[] args)
         {
-
-            //s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            //s.Bind(new IPEndPoint(0, 20000));
             IPEndPoint end = new IPEndPoint(0,20000);
             TcpListener listen = new TcpListener(end);
-
+           
             while (true)
             {
                 listen.Start(100);
@@ -33,40 +32,89 @@ namespace Server
                 allSockets.Add(client);
                 clientsConnected++;
                 Console.WriteLine(clientsConnected + " Clients");
-                Thread t = new Thread(newUser);
-                t.Start();
+                Thread t = new Thread(threadRun);
+                Thread r = new Thread(lobbyCheck);
+                //r.Start();
+                //if (readToGo)
+                //{
+                   
+                    t.Start();
+                //}
                 Console.WriteLine("Client Connected");
             }
             Console.Read();
-            s.Close();
-
-
         }
 
-        public static void newUser()
+        public static void lobbyCheck()
         {
-            //Socket accepted = allSockets.ElementAt(clientsConnected - 1);
+            Console.WriteLine();
+            TcpClient accepted = allSockets.ElementAt(clientsConnected - 1);
+            NetworkStream strem = accepted.GetStream();
+            byte[] bytes = new byte[655357];
+            
+
+            int i;
+
+            string str;
+
+            try
+            {
+                while ((i = strem.Read(bytes, 0, bytes.Length)) != 0)
+                {
+
+                    str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                    Console.WriteLine("Recieved: " + str);
+
+                    str = str.ToUpper();
+
+                    string[] recMessage = str.Split('$');
+
+                    if (recMessage[1] == "Y" && !ready.Contains(recMessage[2]))
+                    {
+                        ready.Add(recMessage[2]);
+                        numReady++;
+                    }
+                    if (numReady == clientsConnected)
+                    {
+                        string start = "Start Game";
+                        byte[] startBytes = System.Text.Encoding.ASCII.GetBytes(start);
+                        foreach (TcpClient s in allSockets)
+                        {
+                            NetworkStream eachStrem = s.GetStream();
+                            if (s != accepted)//don't send to self
+                            {
+                                eachStrem.Write(startBytes, 0, startBytes.Length);
+                            }
+                        }
+                        readyToGo = true;
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public static void threadRun()
+        {
             TcpClient accepted = allSockets.ElementAt(clientsConnected -1);
             NetworkStream strem = accepted.GetStream();
             byte[] bytes = new byte[655357];
            
             int i;
+          
             string str;
+
             try
             {
                 while ((i = strem.Read(bytes, 0, bytes.Length))!=0)
                 {
+                    
                     str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                     Console.WriteLine("Recieved: " + str);
-                    //buffer = new byte[accepted.ReceiveBufferSize];
-                    //int bytesRead = strem.;
 
                     str = str.ToUpper();
-
-                    byte[] formatted = System.Text.Encoding.ASCII.GetBytes(str);
-                    //strem.Read(buffer,0, accepted.ReceiveBufferSize);
-
-                    //string strData = Encoding.ASCII.GetString(buffer);
+                    byte[] formatted = System.Text.Encoding.ASCII.GetBytes(str);            
 
                     foreach (TcpClient s in allSockets)
                     {
@@ -76,7 +124,51 @@ namespace Server
                             eachStrem.Write(formatted,0,formatted.Length);
                         }
                     }
+                    if(readyToGo == false)
+                    {
+                        string[] recMessage = str.Split('$');
+                        string username = "";
+                        if (recMessage[1] == "Y" && !ready.Contains(recMessage[2]))
+                        {
+                            ready.Add(recMessage[2]);
+                            users.Add(username, new ClientUser());
+                            username = recMessage[2];
+                            numReady++;
+                            foreach (KeyValuePair<string, ClientUser> u in users)
+                            {
+                                u.Value.setState(4);
+                            }
+                        }
+                        if (numReady == clientsConnected)
+                        {
+                            string start = ("4$"+username+"$");
+                            int allReady = 0;
+                            byte[] startBytes = System.Text.Encoding.ASCII.GetBytes(start);
 
+                            foreach (TcpClient s in allSockets)
+                            {
+                                NetworkStream eachStrem = s.GetStream();
+                                if (s != accepted)//don't send to self
+                                {
+                                    eachStrem.Write(startBytes, 0, startBytes.Length);
+                                }
+                            }
+                            foreach (KeyValuePair<string, ClientUser> u in users)
+                            {
+                                if (u.Value.getState() == 4)
+                                {
+                                    allReady++;
+                                }
+
+                            }
+                            if (allReady == clientsConnected)
+                            {
+                                readyToGo = true;
+                            }
+                           
+                            //readyToGo = true;
+                        }
+                    }
                     Console.WriteLine();
                 }
             }

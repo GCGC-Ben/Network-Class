@@ -27,7 +27,8 @@ namespace RatRunRacer
         static public NetworkStream strem;
         static bool canPress;
         public static Thread readerThread;
-        static int amountrdy;
+        static int amountrdy = 0;
+        static bool isReady = false;
 
         public static void load(ContentManager content)
         {
@@ -103,32 +104,46 @@ namespace RatRunRacer
         }
         public static bool waiting()
         {
+            
             if (Keyboard.GetState().IsKeyDown(Keys.R))
             {
                 myp.ratIsReady = true;
                 myp.sendLobbyInfoToServer();
-            }
-
-
-            amountrdy = 0;
-            OtherRats.allrats = OtherRats.Newrats;
-            foreach (KeyValuePair<string, Rat> r in OtherRats.allrats)
-            {
-                if (r.Value.ratIsReady)
-                {
-                    amountrdy++;
-                }
-            }
-            if (myp.ratIsReady)
-            {
                 amountrdy++;
             }
-            if (amountrdy > OtherRats.allrats.Count)
+
+            NetworkStream testStrem = client.GetStream();
+            byte[] bytes = new byte[655357];
+            //int x = testStrem.Read(bytes, 0, bytes.Length);
+
+            //amountrdy = 0;
+            //OtherRats.allrats = OtherRats.Newrats;
+            //foreach (KeyValuePair<string, Rat> r in OtherRats.allrats)
+            //{
+            //    if (r.Value.ratIsReady)
+            //    {
+            //        amountrdy++;
+            //    }
+            //}
+            //if (myp.ratIsReady)
+            //{
+            //    amountrdy++;
+            //}
+            //if (amountrdy >= OtherRats.allrats.Count)
+            //{
+            //    return true;
+            //}
+
+            //if (readLobby())
+            //{
+                //return true;
+            //}
+            if (isReady)
             {
                 return true;
             }
    
-            return true;
+            return false;
         }
 
         public static void ConnectToServer()
@@ -164,6 +179,34 @@ namespace RatRunRacer
             }
         }
 
+        public static bool readLobby(){
+            byte[] bytes = new byte[655357];
+
+            try
+            {
+                NetworkStream stream = client.GetStream();
+                int i;
+                i = stream.Read(bytes, 0, bytes.Length);
+
+
+                String str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                byte[] buffer;
+                buffer = System.Text.Encoding.ASCII.GetBytes(str);
+
+                string strData = Encoding.ASCII.GetString(buffer);
+
+                if (strData == "Start Game")
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+            }
+
+            return false;
+        }
+
        public static void readThread()
         {
             try
@@ -183,7 +226,10 @@ namespace RatRunRacer
                         buffer = System.Text.Encoding.ASCII.GetBytes(str);
 
                         string strData = Encoding.ASCII.GetString(buffer);
-
+                        if (strData == "Start Game")
+                        {
+                            isReady = true;
+                        }
                         string[] allData = strData.Split('$');
                         if (allData[0] == "0")
                         {
@@ -228,6 +274,10 @@ namespace RatRunRacer
                                     OtherRats.Newrats[allData[2]].ratIsReady = true;
                                 }
                             }
+                        }
+                        else if (allData[0] == "4")
+                        {
+                            isReady = true;
                         }
                     }
                     catch
