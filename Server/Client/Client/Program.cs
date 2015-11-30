@@ -12,7 +12,6 @@ namespace Client
 
     class Program
     {
-        static Socket s;
         static bool connected;
        
         static TcpClient client;
