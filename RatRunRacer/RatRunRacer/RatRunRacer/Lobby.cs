@@ -31,6 +31,7 @@ namespace RatRunRacer
         static string connectedUsers = "";
         static bool isReady = false;
         static bool isFinshed = false;
+        static bool failedToConnect = false;
         static string whoWonLastGame = "No One";
 
         public static void load(ContentManager content)
@@ -89,8 +90,17 @@ namespace RatRunRacer
 
             if (Keyboard.GetState().IsKeyDown(Keys.Enter)&&canPress)
             {
+                failedToConnect = false;
                 ConnectToServer();
-                state = 1;
+                if (connected)
+                {
+                    state = 1;
+                    failedToConnect = false;
+                }
+                else
+                {
+                    failedToConnect = true;
+                }
                 canPress = false;
             }
             if (Keyboard.GetState().IsKeyUp(Keys.Enter))
@@ -334,6 +344,11 @@ namespace RatRunRacer
                         new Vector2(font.MeasureString("IP: " + serverIP).X / 2, 0), 1f, SpriteEffects.None, 0f);
                     sb.DrawString(font, "UserName: " + myp.username, new Vector2(640, 400), Color.White, 0f,
                         new Vector2(font.MeasureString("UserName: " + myp.username).X / 2, 0), 1f, SpriteEffects.None, 0f);
+                }
+                if (failedToConnect)
+                {
+                       sb.DrawString(font, "Failed To Connect to the Server", new Vector2(640, 530),
+                    new Color(255,100,100), 0f, new Vector2(font.MeasureString("Failed To Connect to the Server").X / 2, 0), 1f, SpriteEffects.None, 0f);
                 }
                 sb.DrawString(font, "Press ENTER To Connect to server", new Vector2(640, 600),
                     Color.White, 0f, new Vector2(font.MeasureString("Press ENTER To Connect to server").X / 2, 0), 1f, SpriteEffects.None, 0f);
