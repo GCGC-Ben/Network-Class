@@ -13,7 +13,7 @@ namespace RatRunRacer
     class World
     {
         public static Texture2D dirtTxt,dirtBottemTxt,cloudTxt,cloud2Txt,rockTxt,platTxt,flTxt,blacknessTxt;
-        public static Texture2D level1Map;
+        public static Texture2D clevelMap, level1Map,level2Map;
         Random rand;
 
         List<Tile> allWorldTiles = new List<Tile>();
@@ -31,24 +31,34 @@ namespace RatRunRacer
             flTxt = content.Load<Texture2D>("Tiles\\finshline");
             blacknessTxt = content.Load<Texture2D>("Tiles\\blackness");
 
-            level1Map = content.Load<Texture2D>("Level\\Level1");
+            level1Map = content.Load<Texture2D>("Level\\Level2");
+            level2Map = content.Load<Texture2D>("Level\\Level1");
         }
 
-        public World()
+        public World(string lvl)
         {
             rand = new Random();
 
             Color[] levelColors = new Color[200000];
-            level1Map.GetData(levelColors);
-
-            for (int y = 0; y < level1Map.Height; y++)
+            if (lvl == "1")
             {
-                for(int x = 0; x<level1Map.Width; x++)
+                clevelMap = level1Map;
+            }
+            else
+            {
+                clevelMap = level2Map;
+            }
+
+            clevelMap.GetData(levelColors);
+
+            for (int y = 0; y < clevelMap.Height; y++)
+            {
+                for(int x = 0; x<clevelMap.Width; x++)
                 {
-                switch (levelColors[x+(y*level1Map.Width)].R)
+                switch (levelColors[x+(y*clevelMap.Width)].R)
                 {
                     case 255:
-                        if (levelColors[x + (y * level1Map.Width)].G != 255)
+                        if (levelColors[x + (y * clevelMap.Width)].G != 255)
                         {
                          allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),dirtTxt));
                          solidTiles.Add(new Tile(new Vector2(x * 16, y * 16), dirtTxt));
@@ -65,7 +75,7 @@ namespace RatRunRacer
                         break;
 
                     case 0:
-                        if (levelColors[x + (y * level1Map.Width)].A == 255)
+                        if (levelColors[x + (y * clevelMap.Width)].A == 255)
                         {
                             allWorldTiles.Add(new Tile(new Vector2(x*16,y*16),platTxt));
                             solidTiles.Add(new Tile(new Vector2(x * 16, y * 16), platTxt ));
@@ -75,7 +85,7 @@ namespace RatRunRacer
                 }
             }
 
-            for (int x = 0; x < level1Map.Width; x++)
+            for (int x = 0; x < clevelMap.Width; x++)
             {
                 for(int y= 100; y <200; y++)
                 {

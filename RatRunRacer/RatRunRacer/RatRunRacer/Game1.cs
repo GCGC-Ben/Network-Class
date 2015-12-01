@@ -60,7 +60,7 @@ namespace RatRunRacer
             MainMenu.load(Content);
             mainMenu.generateMenu();
             World.load(Content);
-            World1 = new World();
+            World1 = new World("1");
         }
 
         protected override void UnloadContent()
