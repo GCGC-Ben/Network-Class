@@ -103,9 +103,9 @@ namespace Server
 
                                 if (check[0] == "1")
                                 {
-                                    if (users[check[3]].getState() != 4)
+                                    if (users[check[4]].getState() != 4)
                                     {
-                                        users[check[3]].setState(4);
+                                        users[check[4]].setState(4);
                                     }
                                 }
                             }
