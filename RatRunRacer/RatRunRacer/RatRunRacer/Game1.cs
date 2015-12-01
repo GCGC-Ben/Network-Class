@@ -86,27 +86,32 @@ namespace RatRunRacer
 
             if (state == GameState.playing)
             {
-                myPlayer.update(World1);
-                OtherRats.update(World1);
-
-                if (myPlayer.pos.X > 650)
+                if (myPlayer.update(World1)) 
                 {
-                    cam._pos.X = myPlayer.pos.X;
+                    OtherRats.update(World1);
+
+                    if (myPlayer.pos.X > 650)
+                    {
+                        cam._pos.X = myPlayer.pos.X;
+                    }
+                    else
+                    {
+                        cam._pos.X = 650;
+                    }
+                    if (myPlayer.pos.Y < 1235)
+                    {
+                        cam._pos.Y = myPlayer.pos.Y;
+                    }
+                    else
+                    {
+                        cam._pos.Y = 1235;
+                    }
+                    World1.update();
                 }
                 else
                 {
-                    cam._pos.X = 650;
+                    state = GameState.lobby;
                 }
-                if (myPlayer.pos.Y < 1235)
-                {
-                    cam._pos.Y = myPlayer.pos.Y;
-                }
-                else
-                {
-                    cam._pos.Y = 1235;
-                }
-                World1.update();
-
                 if (Lobby.goBackToLobby())
                 {
                     state = GameState.lobby;

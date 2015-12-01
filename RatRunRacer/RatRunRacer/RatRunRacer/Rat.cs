@@ -48,7 +48,7 @@ namespace RatRunRacer
             isControled = true;
         }
 
-        public void update(World world1)
+        public bool update(World world1)
         {
 
             KeyboardState kb = Keyboard.GetState();
@@ -117,13 +117,36 @@ namespace RatRunRacer
                             sendIFinshed();
                         }
                     }
-                    sendPosToServer();
+                    try
+                    {
+                        sendPosToServer();
+                    }
+                    catch
+                    {
+                        Lobby.state = 0;
+                        Lobby.lostConnection = true;
+                        Lobby.connected = false;
+                        Lobby.resetLobbyPlayer();
+                        return false;
+                    }
                 }
                 else
                 {
-                    sendIFinshed();
+                    try
+                    {
+                        sendIFinshed();
+                    }
+                    catch
+                    {
+                        Lobby.state = 0;
+                        Lobby.lostConnection = true;
+                        Lobby.connected = false;
+                        Lobby.resetLobbyPlayer();
+                        return false;
+                    }
                 }
             }
+            return true;
         }
         void sendPosToServer() //think about giving this its own thread as to not lag your game
         {

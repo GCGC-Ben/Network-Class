@@ -21,7 +21,7 @@ namespace RatRunRacer
         static int select;
         static string serverIP ="";
         static int waitTime;
-        static int state = 0;
+        public static int state = 0;
         public static bool connected = false;
         static TcpClient client;
         static public NetworkStream strem;
@@ -32,14 +32,14 @@ namespace RatRunRacer
         static bool isReady = false;
         static bool isFinshed = false;
         static bool failedToConnect = false;
+        public static bool lostConnection = false;
         static string whoWonLastGame = "No One";
 
         public static void load(ContentManager content)
         {
             background = content.Load<Texture2D>("Icons\\backgroundtxt");
             font = content.Load<SpriteFont>("Fonts\\Font1");
-            myp=new Rat(Color.White, new Vector2(100, 500),new Vector2(0,0));
-            myp.makePlayerControled();
+            resetLobbyPlayer();
         }
 
         public static bool Update()
@@ -327,6 +327,14 @@ namespace RatRunRacer
             }
         }
 
+       public static void resetLobbyPlayer()
+       {
+           myp = new Rat(Color.White, new Vector2(100, 500), new Vector2(0, 0));
+           myp.makePlayerControled();
+           OtherRats.allrats.Clear();
+           OtherRats.Newrats.Clear();
+           isReady = false; 
+       }
         public static void Draw(SpriteBatch sb)
         {
             if (state == 0)
@@ -350,6 +358,12 @@ namespace RatRunRacer
                        sb.DrawString(font, "Failed To Connect to the Server", new Vector2(640, 530),
                     new Color(255,100,100), 0f, new Vector2(font.MeasureString("Failed To Connect to the Server").X / 2, 0), 1f, SpriteEffects.None, 0f);
                 }
+                else if (lostConnection)
+                {
+                         sb.DrawString(font, "Lost Connection to the Server", new Vector2(640, 530),
+                    new Color(255,100,100), 0f, new Vector2(font.MeasureString("Lost Connection to the Server").X / 2, 0), 1f, SpriteEffects.None, 0f);
+                }
+
                 sb.DrawString(font, "Press ENTER To Connect to server", new Vector2(640, 600),
                     Color.White, 0f, new Vector2(font.MeasureString("Press ENTER To Connect to server").X / 2, 0), 1f, SpriteEffects.None, 0f);
             }
