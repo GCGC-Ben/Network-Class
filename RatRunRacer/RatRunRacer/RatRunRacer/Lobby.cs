@@ -250,6 +250,15 @@ namespace RatRunRacer
                                       (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
                                       allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y')))));
                                 OtherRats.Newrats[allData.ElementAt(4)].username = allData[4];
+
+                                if(allData[3] == "R")
+                                {
+                                     OtherRats.Newrats[allData[4]].facingRight = true;
+                                }
+                                else
+                                {
+                                     OtherRats.Newrats[allData[4]].facingRight = false;
+                                }
                             }
                             else
                             {

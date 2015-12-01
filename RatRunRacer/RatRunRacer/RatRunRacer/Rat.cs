@@ -19,7 +19,7 @@ namespace RatRunRacer
         Vector2 vel;
         bool onGround;
         Rectangle bb;
-        bool facingRight;
+        public bool facingRight;
         bool justHitGround;
         Vector2 startPos;
         public bool ratIsReady;
