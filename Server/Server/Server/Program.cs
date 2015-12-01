@@ -87,7 +87,7 @@ namespace Server
                         if (stageSel)
                         {
                             //format info into bytes
-                            byte[] stage = Encoding.ASCII.GetBytes("5$"+stageNum);
+                            byte[] stage = Encoding.ASCII.GetBytes("5$"+stageNum + "$");
                             //send to clients
                             foreach (TcpClient s in allSockets)
                             {
@@ -103,7 +103,7 @@ namespace Server
                         //format the hello message to get the number of clients, 
                         //weird bug in the client where the number of players that are connected never change from 1 
                         //even when set to 2   
-                        byte[] hello = Encoding.ASCII.GetBytes("0$Hello$" + clientsConnected + "$" + recieved[1]);
+                        byte[] hello = Encoding.ASCII.GetBytes("0$Hello$" + clientsConnected + "$" + recieved[1] + "$");
                         //send to clients
                         foreach (TcpClient s in allSockets)
                         {
@@ -117,17 +117,18 @@ namespace Server
                     //if recieving finish line crossed
                     if (recieved[0] == "3")
                     {
-                        string win = "3$";
+                        string win = "6$";
                         //add to win array
-                        if (!winners.Contains(recieved[3]))
+                        if (!winners.Contains(recieved[2]))
                         {
-                            winners.Add(recieved[3]);
+                            winners.Add(recieved[2]);
                         }
-                        //format the data to send 3$first$second$third$....
+                        //format the data to send 6$first$second$third$....
                         foreach(string w in winners)
                         {
                             win += (w+"$");
                         }
+                        win += "$^";
                         //convert to bytes to send
                         byte[] winList = Encoding.ASCII.GetBytes(win);
                         //send the winner list to clients
