@@ -313,6 +313,7 @@ namespace RatRunRacer
                         {
                             whoWonLastGame = allData[1];
                             isFinshed = true;
+                            resetLobbyPlayer();
                         }
                     }
                     catch
@@ -335,6 +336,7 @@ namespace RatRunRacer
            OtherRats.Newrats.Clear();
            isReady = false; 
        }
+
         public static void Draw(SpriteBatch sb)
         {
             if (state == 0)
@@ -378,7 +380,7 @@ namespace RatRunRacer
                 sb.DrawString(font, "Connected To Server Waiting on players", new Vector2(640, 600),
                    Color.White, 0f, new Vector2(font.MeasureString("Connected To Server Waiting on players").X / 2, 0), 1f, SpriteEffects.None, 0f);
 
-               sb.DrawString(font, whoWonLastGame +"-Won the last game", new Vector2(640, 400),
+               sb.DrawString(font, whoWonLastGame +" Won the last game", new Vector2(640, 400),
                    Color.White, 0f, new Vector2(font.MeasureString( whoWonLastGame +" Won the last game").X / 2, 0), 1f, SpriteEffects.None, 0f);
             }
 
