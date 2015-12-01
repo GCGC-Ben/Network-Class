@@ -106,6 +106,7 @@ namespace RatRunRacer
 
             if (Lobby.connected &&isControled)
             {
+                //if the finish line is crossed
                 if (!iFinshed)
                 {
                     foreach (Tile t in world1.finshLine)

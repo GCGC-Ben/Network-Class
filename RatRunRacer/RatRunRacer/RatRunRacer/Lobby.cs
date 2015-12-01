@@ -28,6 +28,7 @@ namespace RatRunRacer
         static bool canPress;
         public static Thread readerThread;
         static int amountrdy = 0;
+        static string connectedUsers = "";
         static bool isReady = false;
 
         public static void load(ContentManager content)
@@ -208,16 +209,16 @@ namespace RatRunRacer
                         buffer = System.Text.Encoding.ASCII.GetBytes(str);
 
                         string strData = Encoding.ASCII.GetString(buffer);
-                        if (strData == "Start Game")
-                        {
-                            isReady = true;
-                        }
                         string[] allData = strData.Split('$');
                         if (allData[0] == "0")
                         {
                             if (!OtherRats.Newrats.ContainsKey(allData[1]))
                             {
                                 OtherRats.Newrats.Add(allData[1], new Rat(Color.White, new Vector2(0, 0),new Vector2(0,0)));
+                            }
+                            if (allData[1] == "Hello")
+                            {
+                                connectedUsers = allData[2];
                             }
                         }
                         if (allData[0] == "1")
@@ -304,7 +305,7 @@ namespace RatRunRacer
                     Color.White, 0f, new Vector2(font.MeasureString("Press R To Ready Up").X / 2, 0), 1f, SpriteEffects.None, 0f);
 
                 sb.DrawString(font, amountrdy+"/"+(OtherRats.allrats.Count+1)+" Players Ready", new Vector2(640, 350),
-                    Color.White, 0f, new Vector2(font.MeasureString(amountrdy + "/" + (OtherRats.allrats.Count + 1) + " Players Ready").X / 2, 0), 1f, SpriteEffects.None, 0f);
+                    Color.White, 0f, new Vector2(font.MeasureString(amountrdy + "/" + connectedUsers + " Players Ready").X / 2, 0), 1f, SpriteEffects.None, 0f);
 
                 sb.DrawString(font, "Connected To Server Waiting on players", new Vector2(640, 600),
                    Color.White, 0f, new Vector2(font.MeasureString("Connected To Server Waiting on players").X / 2, 0), 1f, SpriteEffects.None, 0f);
