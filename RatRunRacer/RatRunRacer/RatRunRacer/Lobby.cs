@@ -137,8 +137,12 @@ namespace RatRunRacer
             if(isFinshed)
             {
                 //reset stuff to get ready for new lobby
-                isFinshed = false; 
-                myp.ratIsReady = false;
+                isFinshed = false;
+                string myname = myp.username;
+                myp = new Rat(Color.White, new Vector2(100, 500), new Vector2(0, 0)); //make a new rat player
+                myp.username = myname;
+                myp.makePlayerControled();
+
                 OtherRats.allrats.Clear();
                 OtherRats.Newrats.Clear();
                 return true;

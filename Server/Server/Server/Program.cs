@@ -25,10 +25,10 @@ namespace Server
         static void Main(string[] args)
         {
             //set port info
-            IPEndPoint end = new IPEndPoint(0,20000);
+            IPEndPoint end = new IPEndPoint(0, 20000);
             //set up lister server
             TcpListener listen = new TcpListener(end);
-           
+
             while (true)
             {
                 listen.Start(100);
@@ -42,22 +42,21 @@ namespace Server
                 Thread t = new Thread(threadRun);
                 //begin the thread
                 t.Start();
-                
+
                 Console.WriteLine("Client Connected");
             }
-            Console.Read();
         }
 
-       
-        //main thread for server
+
+        //main thread for a client 
         public static void threadRun()
         {
             //get current client
-            TcpClient accepted = allSockets.ElementAt(clientsConnected -1);
+            TcpClient accepted = allSockets.ElementAt(clientsConnected - 1);
             //get client's stream
             NetworkStream strem = accepted.GetStream();
             byte[] bytes = new byte[655357];
-            
+
             //holds data for transfer
             int i;
             //string for data
@@ -65,7 +64,7 @@ namespace Server
 
             try
             {
-                while ((i = strem.Read(bytes, 0, bytes.Length))!=0)
+                while ((i = strem.Read(bytes, 0, bytes.Length)) != 0)
                 {
                     //convert the recieved bytes into string for printing and transmitting to other clients
                     str = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
@@ -87,7 +86,7 @@ namespace Server
                         if (stageSel)
                         {
                             //format info into bytes
-                            byte[] stage = Encoding.ASCII.GetBytes("5$"+stageNum + "$");
+                            byte[] stage = Encoding.ASCII.GetBytes("5$" + stageNum + "$");
                             //send to clients
                             foreach (TcpClient s in allSockets)
                             {
@@ -117,79 +116,47 @@ namespace Server
                     //if recieving finish line crossed
                     if (recieved[0] == "3")
                     {
-                        string win = "6$";
-                        //add to win array
-                        if (!winners.Contains(recieved[2]))
-                        {
-                            winners.Add(recieved[2]);
-                        }
-                        //format the data to send 6$first$second$third$....$^$
-                        foreach(string w in winners)
-                        {
-                            win += (w+"$");
-                        }
-                        win += "$^$";
-                        //convert to bytes to send
-                        byte[] winList = Encoding.ASCII.GetBytes(win);
-                        //send the winner list to clients
-                        foreach (TcpClient s in allSockets)
-                        {
-                            NetworkStream eachStrem = s.GetStream();
-                            eachStrem.Write(winList, 0, winList.Length);
-                        }
-                        //set data for next stage
-                        if (stageNum < 2)
-                        {
-                            stageNum++;
-                            stageSel = true;
-                        }
-                        //restart the stage selection
-                        else
-                        {
-                            stageNum = 1;
-                            stageSel = true;
-                        }
+                        finshLineCalcs(recieved); 
                     }
-
 
                     if (readyToGo)
                     {
-                        //sed to clients when game is in race mode
+                        //send to clients when game is in race mode
                         foreach (TcpClient s in allSockets)
                         {
                             NetworkStream eachStrem = s.GetStream();
-                            if (s != accepted)//don't send to self
-                            {
-                                eachStrem.Write(formatted, 0, formatted.Length);
-                            }
+                            eachStrem.Write(formatted, 0, formatted.Length);
+
+                            readyToGo = false; // you sent it so reset the state 
                         }
                     }
                     //If still waiting on players
-                    if(readyToGo == false)
+                    if (readyToGo == false)
                     {
                         string[] recMessage = str.Split('$');
                         string username = "";
-                        if (recMessage[1] == "Y" && !ready.Contains(recMessage[2]))
+                        if (recMessage[1] == "Y" && !ready.Contains(recMessage[2]) &&
+                            recMessage[0] == "2" && !users.ContainsKey(username))
                         {
                             ready.Add(recMessage[2]);
                             username = recMessage[2];
                             users.Add(username, new ClientUser());
-                            
+
                             numReady++;
-                            
+
                         }
                         //if all players are ready begin the game
-                        if (numReady == clientsConnected)
+                        if (numReady >= clientsConnected)
                         {
                             string start = ("4$$");
                             int allReady = 0;
                             byte[] startBytes = System.Text.Encoding.ASCII.GetBytes(start);
-                            
+
                             //send to client
                             foreach (TcpClient s in allSockets)
                             {
                                 NetworkStream eachStrem = s.GetStream();
-                           
+
                                 eachStrem.Write(startBytes, 0, startBytes.Length);
                                 string temp = str;
                                 string[] check = temp.Split('$');
@@ -204,7 +171,7 @@ namespace Server
                             }
 
                             //check to see if trasmitting movement data
-                           //make sure everyone starts at the same time
+                            //make sure everyone starts at the same time
                             foreach (KeyValuePair<string, ClientUser> u in users)
                             {
                                 if (u.Value.getState() == 4)
@@ -217,16 +184,17 @@ namespace Server
                             if (allReady == clientsConnected)
                             {
                                 readyToGo = true;
-                            }  
-                       }
+                            }
+                        }
                     }
 
-                    
+
                     Console.WriteLine();
                 }
             }
-            catch
+            catch(Exception e)
             {
+                Console.WriteLine(e.ToString());
             }
             accepted.Close();
             allSockets.Remove(accepted);
@@ -234,5 +202,57 @@ namespace Server
             Console.WriteLine(clientsConnected + " Clients");
         }
 
+        static void finshLineCalcs(string[] recieved)
+        {
+
+            string win = "6$";
+            //add to win array
+            if (!winners.Contains(recieved[2]))
+            {
+                winners.Add(recieved[2]);
+            }
+
+            if (winners.Count == users.Count) //only send out the finsh message when everyone finshes 
+            {
+                //format the data to send 6$first$second$third$....$^$
+                foreach (string w in winners)
+                {
+                    win += (w + "$");
+                }
+                win += "$^$";
+                //convert to bytes to send
+                byte[] winList = Encoding.ASCII.GetBytes(win);
+                //send the winner list to clients
+
+                foreach (TcpClient s in allSockets)
+                {
+                    NetworkStream eachStrem = s.GetStream();
+                    eachStrem.Write(winList, 0, winList.Length);
+                }
+                //set data for next stage
+                if (stageNum < 2)
+                {
+                    stageNum++;
+                    stageSel = true;
+                }
+                //restart the stage selection
+                else
+                {
+                    stageNum = 1;
+                    stageSel = true;
+                }
+
+                //reset users
+                winners.Clear();
+                ready.Clear();
+                numReady = 0;
+                foreach (KeyValuePair<string, ClientUser> u in users)
+                {
+                    u.Value.setState(0);
+                }
+
+            }
+        }
+    
     }
 }
