@@ -106,6 +106,12 @@ namespace RatRunRacer
                     cam._pos.Y = 1235;
                 }
                 World1.update();
+
+                if (Lobby.goBackToLobby())
+                {
+                    state = GameState.lobby;
+                }
+
             }
             //Selection switch case for main menu
             if (state == GameState.MMenu)

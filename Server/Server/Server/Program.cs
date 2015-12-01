@@ -123,22 +123,19 @@ namespace Server
                         {
                             winners.Add(recieved[2]);
                         }
-                        //format the data to send 6$first$second$third$....
+                        //format the data to send 6$first$second$third$....$^$
                         foreach(string w in winners)
                         {
                             win += (w+"$");
                         }
-                        win += "$^";
+                        win += "$^$";
                         //convert to bytes to send
                         byte[] winList = Encoding.ASCII.GetBytes(win);
                         //send the winner list to clients
                         foreach (TcpClient s in allSockets)
                         {
                             NetworkStream eachStrem = s.GetStream();
-                            if (s != accepted)//don't send to self
-                            {
-                                eachStrem.Write(winList, 0, winList.Length);
-                            }
+                            eachStrem.Write(winList, 0, winList.Length);
                         }
                         //set data for next stage
                         if (stageNum < 2)

@@ -30,6 +30,8 @@ namespace RatRunRacer
         static int amountrdy = 0;
         static string connectedUsers = "";
         static bool isReady = false;
+        static bool isFinshed = false;
+        static string whoWonLastGame = "No One";
 
         public static void load(ContentManager content)
         {
@@ -123,12 +125,27 @@ namespace RatRunRacer
           
             if (isReady)
             {
+                isReady = false;//reset isready
                 return true;
             }
    
             return false;
         }
 
+        public static bool goBackToLobby()
+        {
+            if(isFinshed)
+            {
+                //reset stuff to get ready for new lobby
+                isFinshed = false; 
+                myp.ratIsReady = false;
+                OtherRats.allrats.Clear();
+                OtherRats.Newrats.Clear();
+                return true;
+            }
+
+            return false;
+        }
         public static void ConnectToServer()
         {
             readerThread = new Thread(readThread);
@@ -265,6 +282,15 @@ namespace RatRunRacer
                         {
                             isReady = true;
                         }
+                        else if (allData[0] == "5")
+                        {
+
+                        }
+                        else if (allData[0] == "6")
+                        {
+                            whoWonLastGame = allData[1];
+                            isFinshed = true;
+                        }
                     }
                     catch
                     {
@@ -309,6 +335,9 @@ namespace RatRunRacer
 
                 sb.DrawString(font, "Connected To Server Waiting on players", new Vector2(640, 600),
                    Color.White, 0f, new Vector2(font.MeasureString("Connected To Server Waiting on players").X / 2, 0), 1f, SpriteEffects.None, 0f);
+
+               sb.DrawString(font, whoWonLastGame +"-Won the last game", new Vector2(640, 400),
+                   Color.White, 0f, new Vector2(font.MeasureString( whoWonLastGame +" Won the last game").X / 2, 0), 1f, SpriteEffects.None, 0f);
             }
 
 
