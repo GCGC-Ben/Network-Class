@@ -243,18 +243,21 @@ namespace RatRunRacer
                         string[] allData = strData.Split('$');
                         if (allData[0] == "0")
                         {
-                            if (!OtherRats.Newrats.ContainsKey(allData[1]))
+                            if (allData[1] != "Hello")
                             {
-                                OtherRats.Newrats.Add(allData[1], new Rat(Color.White, new Vector2(0, 0),new Vector2(0,0)));
+                                if (!OtherRats.Newrats.ContainsKey(allData[1]) && myp.username != allData[1])
+                                {
+                                    OtherRats.Newrats.Add(allData[1], new Rat(Color.White, new Vector2(0, 0),new Vector2(0,0)));
+                                }
                             }
-                            if (allData[1] == "Hello")
+                            else
                             {
                                 connectedUsers = allData[2];
                             }
                         }
                         if (allData[0] == "1")
                         {
-                            if (OtherRats.Newrats.ContainsKey(allData[4]))
+                            if (OtherRats.Newrats.ContainsKey(allData[4]) && myp.username != allData[4])
                             {
                                 OtherRats.Newrats[allData.ElementAt(4)] = new Rat(Color.White,
                                   new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
@@ -274,7 +277,7 @@ namespace RatRunRacer
                                      OtherRats.Newrats[allData[4]].facingRight = false;
                                 }
                             }
-                            else
+                            else if( myp.username != allData[4])
                             {
                                 OtherRats.Newrats.Add(allData[4], new Rat(Color.White,
                                   new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
@@ -316,9 +319,9 @@ namespace RatRunRacer
                             resetLobbyPlayer();
                         }
                     }
-                    catch
+                    catch(Exception e)
                     {
-
+                        Console.WriteLine(e.ToString());
                     }
                 }
             }
