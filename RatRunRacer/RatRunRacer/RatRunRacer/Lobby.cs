@@ -110,9 +110,7 @@ namespace RatRunRacer
                 myp.ratIsReady = true;
                 myp.sendLobbyInfoToServer();
             }
-            //int x = testStrem.Read(bytes, 0, bytes.Length);
 
-            //amountrdy = 0;
             OtherRats.allrats = OtherRats.Newrats;
             foreach (KeyValuePair<string, Rat> r in OtherRats.allrats)
             {
@@ -121,19 +119,7 @@ namespace RatRunRacer
                     amountrdy++;
                 }
             }
-            //if (myp.ratIsReady)
-            //{
-            //    amountrdy++;
-            //}
-            //if (amountrdy >= OtherRats.allrats.Count)
-            //{
-            //    return true;
-            //}
-
-            //if (readLobby())
-            //{
-                //return true;
-            //}
+          
             if (isReady)
             {
                 return true;
