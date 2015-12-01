@@ -222,20 +222,20 @@ namespace RatRunRacer
                         }
                         if (allData[0] == "1")
                         {
-                            if (OtherRats.Newrats.ContainsKey(allData[3]))
+                            if (OtherRats.Newrats.ContainsKey(allData[4]))
                             {
-                                OtherRats.Newrats[allData.ElementAt(3)] = new Rat(Color.White,
+                                OtherRats.Newrats[allData.ElementAt(4)] = new Rat(Color.White,
                                   new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
                                       allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y')))), 
                                       new Vector2((float)Convert.ToDouble(allData.ElementAt(2).Substring(1, allData.ElementAt(2).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
                                       allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y')))));
-
+                                OtherRats.Newrats[allData.ElementAt(4)].username = allData[4];
                             }
                             else
                             {
-                                OtherRats.Newrats.Add(allData[3], new Rat(Color.White,
+                                OtherRats.Newrats.Add(allData[4], new Rat(Color.White,
                                   new Vector2((float)Convert.ToDouble(allData.ElementAt(1).Substring(1, allData.ElementAt(1).IndexOf('Y') - 1)),
                                       (float)Convert.ToDouble(allData.ElementAt(1).Substring(allData.ElementAt(1).IndexOf('Y') + 1,
                                       allData.ElementAt(1).Length - 1 - allData.ElementAt(1).IndexOf('Y')))), 
@@ -243,7 +243,7 @@ namespace RatRunRacer
                                       (float)Convert.ToDouble(allData.ElementAt(2).Substring(allData.ElementAt(2).IndexOf('Y') + 1,
                                       allData.ElementAt(2).Length - 1 - allData.ElementAt(2).IndexOf('Y'))))));
                                 
-                                 OtherRats.Newrats[allData.ElementAt(3)].username = allData[3];
+                                 OtherRats.Newrats[allData.ElementAt(4)].username = allData[4];
                             }
                         }
                         else if (allData[0] == "2")
