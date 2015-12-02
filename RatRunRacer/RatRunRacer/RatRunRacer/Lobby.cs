@@ -379,8 +379,8 @@ namespace RatRunRacer
                 sb.DrawString(font, "Press R to Ready Up", new Vector2(640, 300),
                     Color.White, 0f, new Vector2(font.MeasureString("Press R To Ready Up").X / 2, 0), 1f, SpriteEffects.None, 0f);
 
-                sb.DrawString(font, amountrdy+"/"+(OtherRats.allrats.Count+1)+" Players Ready", new Vector2(640, 350),
-                    Color.White, 0f, new Vector2(font.MeasureString(amountrdy + "/" + connectedUsers + " Players Ready").X / 2, 0), 1f, SpriteEffects.None, 0f);
+                //sb.DrawString(font, amountrdy+"/"+(OtherRats.allrats.Count+1)+" Players Ready", new Vector2(640, 350),
+                //    Color.White, 0f, new Vector2(font.MeasureString(amountrdy + "/" + connectedUsers + " Players Ready").X / 2, 0), 1f, SpriteEffects.None, 0f);
 
                 sb.DrawString(font, "Connected To Server Waiting on players", new Vector2(640, 600),
                    Color.White, 0f, new Vector2(font.MeasureString("Connected To Server Waiting on players").X / 2, 0), 1f, SpriteEffects.None, 0f);
