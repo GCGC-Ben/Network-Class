@@ -34,7 +34,7 @@ namespace RatRunRacer
         static bool failedToConnect = false;
         public static bool lostConnection = false;
         static string whoWonLastGame = "No One";
-
+        static string myName = "";
         public static void load(ContentManager content)
         {
             background = content.Load<Texture2D>("Icons\\backgroundtxt");
@@ -65,6 +65,7 @@ namespace RatRunRacer
                     break;
                 case 1:
                     myp.username = TextManager.getString(myp.username);
+                    myName = myp.username;
                     break;
             }
 
@@ -335,6 +336,7 @@ namespace RatRunRacer
        {
            myp = new Rat(Color.White, new Vector2(100, 500), new Vector2(0, 0));
            myp.makePlayerControled();
+           myp.username = myName;
            OtherRats.allrats.Clear();
            OtherRats.Newrats.Clear();
            isReady = false; 

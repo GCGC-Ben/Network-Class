@@ -116,20 +116,26 @@ namespace Server
                     //if recieving finish line crossed
                     if (recieved[0] == "3")
                     {
-                        finshLineCalcs(recieved); 
+                        finshLineCalcs(recieved);
+                    }
+
+                    //send messages to all clients
+                    foreach (TcpClient s in allSockets)
+                    {
+                        if (s != accepted)
+                        {
+                            NetworkStream eachStrem = s.GetStream();
+                            eachStrem.Write(formatted, 0, formatted.Length);
+                        }
+
                     }
 
                     if (readyToGo)
                     {
-                        //send to clients when game is in race mode
-                        foreach (TcpClient s in allSockets)
-                        {
-                            NetworkStream eachStrem = s.GetStream();
-                            eachStrem.Write(formatted, 0, formatted.Length);
-
-                            readyToGo = false; // you sent it so reset the state 
-                        }
+                       readyToGo = false; // you sent it so reset the stat
+                       numReady = 0;
                     }
+
                     //If still waiting on players
                     if (readyToGo == false)
                     {
@@ -192,7 +198,7 @@ namespace Server
                     Console.WriteLine();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
@@ -253,6 +259,6 @@ namespace Server
 
             }
         }
-    
+
     }
 }
